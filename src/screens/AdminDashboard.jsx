@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Users, FileText, School, BarChart2, CheckCircle, XCircle, LogOut, GraduationCap } from 'lucide-react'
+import { Users, FileText, School, BarChart2, CheckCircle, XCircle, RotateCcw, GraduationCap } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { PILLARS } from '../data/pillars'
 import { SCHOOLS } from '../data/schools'
@@ -12,8 +12,14 @@ const NAV = [
 ]
 
 export default function AdminDashboard() {
-  const { publishedLessons, pendingLessons, content, pendingContent, decideContent, decideLesson } = useApp()
+  const { publishedLessons, pendingLessons, content, pendingContent, decideContent, decideLesson, resetDemo } = useApp()
   const [activeNav, setActiveNav] = useState('analytics')
+
+  const handleReset = () => {
+    if (window.confirm('Reset all demo data back to the original seed content? This clears progress, submissions, and moderation decisions on this device.')) {
+      resetDemo()
+    }
+  }
 
   const totalPending = pendingContent.length + pendingLessons.length
   const approvedContent = content.filter(c => c.status === 'approved')
@@ -52,9 +58,9 @@ export default function AdminDashboard() {
           ))}
         </nav>
 
-        <button className="flex items-center gap-3 px-5 py-3 text-gray-500 hover:text-gray-300 text-sm">
-          <LogOut size={16} />
-          <span className="hidden md:block">Logout</span>
+        <button onClick={handleReset} className="flex items-center gap-3 px-5 py-3 text-gray-500 hover:text-gray-300 text-sm">
+          <RotateCcw size={16} />
+          <span className="hidden md:block">Reset Demo Data</span>
         </button>
       </aside>
 
@@ -128,15 +134,15 @@ export default function AdminDashboard() {
                           <span className="text-lg">{typeInfo?.emoji}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
+                          <p className="text-zazi-navy font-bold text-sm truncate">{item.title}</p>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: item.color + '20', color: item.color }}>
                               {typeInfo?.label}
                             </span>
-                            <span className="text-zazi-navy font-bold text-sm truncate">{item.title}</span>
+                            <span className="text-zazi-muted text-[10px]">by {item.author} · {item.school}</span>
                           </div>
-                          <p className="text-zazi-muted text-xs mt-0.5">Submitted by {item.author} · {item.school}</p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <button onClick={() => decideContent(item.id, 'approved')} className="w-8 h-8 rounded-full border-2 border-green-500 flex items-center justify-center hover:bg-green-50">
                             <CheckCircle size={16} className="text-green-500" />
                           </button>
@@ -170,7 +176,7 @@ export default function AdminDashboard() {
                         <span className="text-zazi-navy font-bold text-sm truncate block">{lesson.title}</span>
                         <p className="text-zazi-muted text-xs mt-0.5">By {lesson.contributor} · Grade {lesson.gradeMin}-{lesson.gradeMax}</p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         <button onClick={() => decideLesson(lesson.id, 'published')} className="w-8 h-8 rounded-full border-2 border-green-500 flex items-center justify-center hover:bg-green-50">
                           <CheckCircle size={16} className="text-green-500" />
                         </button>

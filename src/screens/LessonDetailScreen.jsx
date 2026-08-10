@@ -8,27 +8,42 @@ export default function LessonDetailScreen() {
   const navigate = useNavigate()
   const { lessonId } = useParams()
   const { lessons, progress, startLesson, completeLesson, user } = useApp()
-  const lesson = lessons.find(l => l.id === lessonId) || lessons[0]
-  const pillar = PILLARS.find(p => p.id === lesson.pillar)
-  const done = !!progress[lesson.id]?.completed
+  const lesson = lessons.find(l => l.id === lessonId)
   const [justCompleted, setJustCompleted] = useState(false)
   const [comment, setComment] = useState('')
 
-  useEffect(() => { startLesson(lesson.id) }, [lesson.id, startLesson])
+  useEffect(() => { if (lesson) startLesson(lesson.id) }, [lesson, startLesson])
 
   const nextLesson = useMemo(() => {
+    if (!lesson) return null
     return lessons.find(l =>
       l.id !== lesson.id &&
       l.status === 'published' &&
       user.grade >= l.gradeMin && user.grade <= l.gradeMax &&
       !progress[l.id]?.completed
     )
-  }, [lessons, lesson.id, user.grade, progress])
+  }, [lessons, lesson, user.grade, progress])
 
   const handleComplete = () => {
     completeLesson(lesson.id)
     setJustCompleted(true)
   }
+
+  if (!lesson) {
+    return (
+      <div className="min-h-screen bg-zazi-cream flex flex-col items-center justify-center px-8 text-center">
+        <p className="text-3xl mb-2">🔍</p>
+        <h2 className="text-lg font-black text-zazi-navy">Lesson not found</h2>
+        <p className="text-zazi-muted text-sm mt-1">This lesson may have been removed or the link is out of date.</p>
+        <button onClick={() => navigate('/learn')} className="mt-5 bg-zazi-orange text-white font-bold text-sm px-6 py-3 rounded-xl">
+          Back to Learn
+        </button>
+      </div>
+    )
+  }
+
+  const pillar = PILLARS.find(p => p.id === lesson.pillar)
+  const done = !!progress[lesson.id]?.completed
 
   return (
     <div className="min-h-screen bg-zazi-cream flex flex-col">

@@ -14,13 +14,11 @@ export default function ContentViewScreen() {
   const navigate = useNavigate()
   const { contentId } = useParams()
   const { approvedContent } = useApp()
-  const item = approvedContent.find(c => c.id === contentId) || approvedContent[0]
+  const item = approvedContent.find(c => c.id === contentId)
   const [liked, setLiked] = useState(false)
-  const pillar = PILLARS.find(p => p.id === item.pillar)
-  const typeInfo = CONTENT_TYPES.find(t => t.id === item.type)
 
   const handleShare = async () => {
-    if (navigator.share) {
+    if (item && navigator.share) {
       try { await navigator.share({ title: item.title, text: item.description }) } catch { /* cancelled */ }
     }
   }
@@ -28,11 +26,18 @@ export default function ContentViewScreen() {
   if (!item) {
     return (
       <div className="min-h-screen bg-zazi-cream flex flex-col items-center justify-center px-8 text-center">
-        <p className="text-zazi-navy font-bold">Nothing to show yet.</p>
-        <button onClick={() => navigate('/explore')} className="mt-3 text-zazi-orange font-semibold text-sm">Back to Explore</button>
+        <p className="text-3xl mb-2">🔍</p>
+        <h2 className="text-lg font-black text-zazi-navy">This story isn't available</h2>
+        <p className="text-zazi-muted text-sm mt-1">It may still be under review, or the link is out of date.</p>
+        <button onClick={() => navigate('/explore')} className="mt-5 bg-zazi-orange text-white font-bold text-sm px-6 py-3 rounded-xl">
+          Back to Explore
+        </button>
       </div>
     )
   }
+
+  const pillar = PILLARS.find(p => p.id === item.pillar)
+  const typeInfo = CONTENT_TYPES.find(t => t.id === item.type)
 
   return (
     <div className="min-h-screen bg-zazi-cream flex flex-col">

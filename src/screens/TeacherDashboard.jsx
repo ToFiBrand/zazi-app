@@ -55,14 +55,14 @@ export default function TeacherDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6 rounded-none md:rounded-2xl">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-black text-zazi-navy">Welcome, {TEACHER_NAME.split(' ')[0]}</h1>
           <p className="text-zazi-muted text-sm">{TEACHER_NAME} · Tech Educator · Soweto High School</p>
         </div>
         <button
           onClick={() => setShowUpload(true)}
-          className="flex items-center gap-2 bg-zazi-orange text-white font-bold text-sm px-4 py-2.5 rounded-xl"
+          className="flex items-center justify-center gap-2 bg-zazi-orange text-white font-bold text-sm px-4 py-2.5 rounded-xl whitespace-nowrap self-start"
         >
           <Plus size={16} />
           Create Lesson

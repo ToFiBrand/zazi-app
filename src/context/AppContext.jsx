@@ -1,10 +1,12 @@
-import { createContext, useContext, useMemo, useState, useCallback } from 'react'
+import { createContext, useContext, useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import { LESSONS } from '../data/lessons'
 import { STUDENT_CONTENT } from '../data/content'
 import { PILLARS } from '../data/pillars'
 import { SCHOOLS } from '../data/schools'
 
 const AppContext = createContext(null)
+
+const STORAGE_KEY = 'zazi_state_v1'
 
 const INITIAL_USER = {
   firstName: 'Thabo',
@@ -17,18 +19,50 @@ const INITIAL_USER = {
   points: 240,
 }
 
+const INITIAL_NOTIFICATIONS = [
+  { id: 'n-0', type: 'challenge', title: 'New challenge is live', body: 'Create a 60-second video explaining your dream career.', time: '1d ago', read: false },
+]
+
 const seedLessons = () =>
   LESSONS.map(l => ({ ...l, status: 'published', views: Math.floor(400 + Math.random() * 4000), completions: Math.floor(50 + Math.random() * 900) }))
 
+// Persist the mutable slices of app state to localStorage so a page refresh
+// on the deployed demo doesn't wipe out progress, submissions, and moderation
+// decisions. Falls back to fresh seed data if nothing is stored yet, or if
+// storage is unavailable/corrupted (e.g. private browsing).
+function loadPersisted() {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+const persisted = loadPersisted()
+
 export function AppProvider({ children }) {
-  const [user, setUser] = useState(INITIAL_USER)
-  const [lessons, setLessons] = useState(seedLessons)
-  const [progress, setProgress] = useState({}) // { [lessonId]: { started, completed, startedDate, completionDate } }
-  const [content, setContent] = useState(STUDENT_CONTENT)
-  const [notifications, setNotifications] = useState([
-    { id: 'n-0', type: 'challenge', title: 'New challenge is live', body: 'Create a 60-second video explaining your dream career.', time: '1d ago', read: false },
-  ])
-  const [moderationLog, setModerationLog] = useState([])
+  const [user, setUser] = useState(persisted?.user ?? INITIAL_USER)
+  const [lessons, setLessons] = useState(persisted?.lessons ?? seedLessons)
+  const [progress, setProgress] = useState(persisted?.progress ?? {}) // { [lessonId]: { started, completed, startedDate, completionDate } }
+  const [content, setContent] = useState(persisted?.content ?? STUDENT_CONTENT)
+  const [notifications, setNotifications] = useState(persisted?.notifications ?? INITIAL_NOTIFICATIONS)
+  const [moderationLog, setModerationLog] = useState(persisted?.moderationLog ?? [])
+
+  const isFirstRender = useRef(true)
+  useEffect(() => {
+    // Skip the very first effect run — nothing has changed yet, no need to write.
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ user, lessons, progress, content, notifications, moderationLog }))
+    } catch {
+      // Storage unavailable (quota, private mode) — state just won't survive a refresh.
+    }
+  }, [user, lessons, progress, content, notifications, moderationLog])
 
   const school = useMemo(() => SCHOOLS.find(s => s.id === user.schoolId), [user.schoolId])
 
@@ -142,12 +176,23 @@ export function AppProvider({ children }) {
   const approvedContent = useMemo(() => content.filter(c => c.status === 'approved'), [content])
   const pendingContent = useMemo(() => content.filter(c => c.status === 'pending'), [content])
 
+  const resetDemo = useCallback(() => {
+    try { window.localStorage.removeItem(STORAGE_KEY) } catch { /* ignore */ }
+    setUser(INITIAL_USER)
+    setLessons(seedLessons())
+    setProgress({})
+    setContent(STUDENT_CONTENT)
+    setNotifications(INITIAL_NOTIFICATIONS)
+    setModerationLog([])
+  }, [])
+
   const value = {
     user, updateProfile, school,
     lessons, publishedLessons, pendingLessons, addLesson, decideLesson,
     progress, startLesson, completeLesson,
     content, approvedContent, pendingContent, submitContent, decideContent,
     notifications, pushNotification,
+    resetDemo,
     moderationLog,
     stats, pillarProgress,
   }
