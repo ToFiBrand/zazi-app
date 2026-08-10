@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { X, ChevronDown, ImagePlus, CheckCircle2 } from 'lucide-react'
+import { X, ChevronDown, ImagePlus, CheckCircle2, Check } from 'lucide-react'
 import { CONTENT_TYPES } from '../data/content'
 import { PILLARS } from '../data/pillars'
 import { useApp } from '../context/AppContext'
+import { Button } from '../components/ui'
 
 export default function CreateSubmissionScreen() {
   const navigate = useNavigate()
@@ -28,7 +29,7 @@ export default function CreateSubmissionScreen() {
       pillar,
       category: pillar,
       description: description.trim(),
-      color: pillarInfo?.color || '#E07A2F',
+      color: pillarInfo?.color || '#FF8A00',
       school: school?.name,
     })
     setSubmitted(true)
@@ -37,22 +38,19 @@ export default function CreateSubmissionScreen() {
   if (submitted) {
     return (
       <div className="min-h-screen bg-zazi-cream flex flex-col items-center justify-center px-8 text-center">
-        <div className="w-16 h-16 bg-zazi-teal/20 rounded-full flex items-center justify-center mb-4">
+        <div className="w-16 h-16 bg-zazi-teal/12 rounded-full flex items-center justify-center mb-4">
           <CheckCircle2 size={32} className="text-zazi-teal" />
         </div>
-        <h2 className="text-xl font-black text-zazi-navy">Your story has been submitted.</h2>
-        <p className="text-zazi-navy/70 text-sm mt-2 leading-relaxed">
+        <h2 className="text-xl font-extrabold text-zazi-navy">Your story has been submitted.</h2>
+        <p className="text-zazi-navy/60 text-sm mt-2 leading-relaxed">
           Your creation is now being reviewed by the Zazi team. We'll let you know as soon as it's live.
         </p>
-        <button
-          onClick={() => navigate('/home')}
-          className="mt-6 bg-zazi-orange text-white font-bold py-3.5 px-8 rounded-2xl text-sm"
-        >
+        <Button variant="primary" className="mt-6" onClick={() => navigate('/home')}>
           Back to Home
-        </button>
+        </Button>
         <button
           onClick={() => navigate('/profile')}
-          className="mt-2 text-zazi-navy/60 font-semibold py-2 px-8 rounded-2xl text-sm"
+          className="mt-1 text-zazi-navy/50 font-semibold py-2 px-8 rounded-2xl text-sm"
         >
           View My Submissions
         </button>
@@ -65,11 +63,11 @@ export default function CreateSubmissionScreen() {
       {/* Header */}
       <div className="bg-white border-b border-gray-100 px-5 pt-5 pb-4">
         <div className="flex items-center justify-between">
-          <button onClick={() => navigate('/create')} className="w-8 h-8 flex items-center justify-center">
+          <button onClick={() => navigate('/create')} className="w-9 h-9 flex items-center justify-center">
             <X size={20} className="text-zazi-navy" />
           </button>
-          <h2 className="text-base font-black text-zazi-navy">New {typeInfo.label} {typeInfo.emoji}</h2>
-          <div className="w-8" />
+          <h2 className="text-base font-extrabold text-zazi-navy">New {typeInfo.label} {typeInfo.emoji}</h2>
+          <div className="w-9" />
         </div>
       </div>
 
@@ -79,15 +77,15 @@ export default function CreateSubmissionScreen() {
           <label className="block text-zazi-navy font-bold text-sm mb-2">
             {typeInfo.id === 'video' ? 'Video' : typeInfo.id === 'post' ? 'Image (optional)' : 'Cover Image (optional)'}
           </label>
-          <div className="border-2 border-dashed border-zazi-orange/50 rounded-2xl p-6 flex flex-col items-center gap-2 bg-zazi-orange/5">
-            <div className="w-12 h-12 bg-zazi-orange/20 rounded-full flex items-center justify-center">
+          <div className="border-2 border-dashed border-zazi-orange/40 rounded-2xl p-6 flex flex-col items-center gap-2 bg-zazi-orange/5">
+            <div className="w-12 h-12 bg-zazi-orange/15 rounded-full flex items-center justify-center">
               <ImagePlus size={20} className="text-zazi-orange" />
             </div>
             <p className="text-zazi-navy font-bold text-sm">
               {typeInfo.id === 'video' ? 'Upload your video' : 'Add media'}
             </p>
-            <p className="text-zazi-muted text-xs">MP4, JPG or PNG up to 100MB</p>
-            <button className="bg-zazi-orange text-white font-bold text-sm px-5 py-2 rounded-xl mt-1">Choose File</button>
+            <p className="text-zazi-navy/45 text-xs">MP4, JPG or PNG up to 100MB</p>
+            <Button variant="primary" size="sm" className="mt-1">Choose File</Button>
           </div>
         </div>
 
@@ -132,40 +130,34 @@ export default function CreateSubmissionScreen() {
         </div>
 
         {/* Challenge toggle */}
-        <label className="flex items-center justify-between bg-white rounded-xl px-4 py-3 shadow-card cursor-pointer">
-          <span className="text-zazi-navy font-semibold text-sm">This is a response to a Zazi Challenge</span>
+        <label className="flex items-center justify-between bg-white rounded-2xl px-4 py-3.5 shadow-soft cursor-pointer">
+          <span className="text-zazi-navy font-semibold text-sm pr-3">This is a response to a Zazi Challenge</span>
           <button
             type="button"
             onClick={() => setIsChallengeResponse(v => !v)}
-            className="w-6 h-6 rounded flex items-center justify-center transition-colors"
-            style={{ background: isChallengeResponse ? '#E07A2F' : '#e5e7eb' }}
+            className="w-6 h-6 rounded-md flex items-center justify-center transition-colors flex-shrink-0"
+            style={{ background: isChallengeResponse ? '#FF8A00' : '#EFE4C9' }}
           >
-            {isChallengeResponse && <span className="text-white text-xs font-bold">✓</span>}
+            {isChallengeResponse && <Check size={14} strokeWidth={3} className="text-white" />}
           </button>
         </label>
 
         {/* School (read-only) */}
-        <div className="bg-gray-100 rounded-xl px-4 py-3 flex items-center justify-between">
-          <span className="text-zazi-muted text-sm">School</span>
+        <div className="bg-zazi-input-bg rounded-2xl px-4 py-3.5 flex items-center justify-between">
+          <span className="text-zazi-navy/50 text-sm">School</span>
           <span className="text-zazi-navy font-semibold text-sm">{school?.name}</span>
         </div>
 
         {/* Moderation notice */}
-        <div className="bg-zazi-navy/5 rounded-xl px-4 py-3">
-          <p className="text-zazi-navy/70 text-xs leading-relaxed">
+        <div className="bg-zazi-navy/5 rounded-2xl px-4 py-3.5">
+          <p className="text-zazi-navy/60 text-xs leading-relaxed">
             Your submission will be reviewed by the Zazi team before it appears publicly. This keeps Zazi safe for everyone.
           </p>
         </div>
 
-        <button
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          className={`w-full font-black py-4 rounded-2xl text-base transition-all ${
-            canSubmit ? 'bg-zazi-orange text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-          }`}
-        >
+        <Button variant="primary" size="lg" full onClick={handleSubmit} disabled={!canSubmit}>
           Submit for Review
-        </button>
+        </Button>
       </div>
     </div>
   )

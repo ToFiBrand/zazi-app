@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronDown, ChevronLeft } from 'lucide-react'
 import { SCHOOLS } from '../data/schools'
 import { useApp } from '../context/AppContext'
+import Button from '../components/ui/Button'
 
 const GRADES = [7, 8, 9, 10, 11, 12]
 const LANGS = ['English','Zulu','Xhosa','Afrikaans','Sotho','Tswana']
@@ -48,7 +49,7 @@ export default function SignUpScreen() {
           <ChevronLeft size={20} className="text-zazi-navy" />
         </button>
         <div>
-          <h1 className="text-xl font-black text-zazi-navy">Create Account</h1>
+          <h1 className="text-2xl font-extrabold text-zazi-navy">Create Account</h1>
           <p className="text-zazi-muted text-xs">Join the Zazi community</p>
         </div>
       </div>
@@ -141,15 +142,9 @@ export default function SignUpScreen() {
           </span>
         </label>
 
-        <button
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          className={`w-full font-bold py-4 rounded-2xl text-base mt-2 transition-all ${
-            canSubmit ? 'bg-zazi-orange text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-          }`}
-        >
+        <Button variant="primary" size="lg" full onClick={handleSubmit} disabled={!canSubmit} className="mt-2">
           Create Account
-        </button>
+        </Button>
 
         <p className="text-center text-sm text-zazi-muted">
           Already have an account?{' '}

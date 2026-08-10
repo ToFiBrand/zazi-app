@@ -51,10 +51,10 @@ export default function SponsorDashboard() {
       {/* KPI cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Learners Reached',    val: totalLearners.toLocaleString(), icon: Users,     color: '#3B9A8C' },
-          { label: 'Schools Reached',     val: SCHOOLS.length,                 icon: SchoolIcon,color: '#F0A500' },
-          { label: 'Lesson Completions',  val: totalCompletions.toLocaleString(), icon: Award,   color: '#E07A2F' },
-          { label: 'Engagement Rate',     val: `${engagementRate}%`,           icon: TrendingUp,color: '#7C5CBF' },
+          { label: 'Learners Reached',    val: totalLearners.toLocaleString(), icon: Users,     color: '#006E68' },
+          { label: 'Schools Reached',     val: SCHOOLS.length,                 icon: SchoolIcon,color: '#F4B84C' },
+          { label: 'Lesson Completions',  val: totalCompletions.toLocaleString(), icon: Award,   color: '#FF8A00' },
+          { label: 'Engagement Rate',     val: `${engagementRate}%`,           icon: TrendingUp,color: '#0D665F' },
         ].map(k => (
           <div key={k.label} className="bg-white rounded-2xl p-5 shadow-card">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: k.color + '20' }}>
@@ -92,7 +92,7 @@ export default function SponsorDashboard() {
               <div key={g.grade} className="flex-1 flex flex-col items-center gap-1">
                 <div
                   className="w-full rounded-t-lg"
-                  style={{ height: `${(g.learners / maxGradeLearners) * 110}px`, background: 'linear-gradient(to top, #E07A2F, #F0A500)', minHeight: 8 }}
+                  style={{ height: `${(g.learners / maxGradeLearners) * 110}px`, background: 'linear-gradient(to top, #FF8A00, #F4B84C)', minHeight: 8 }}
                 />
                 <span className="text-[9px] text-zazi-muted">Gr {g.grade}</span>
               </div>

@@ -72,10 +72,10 @@ export default function TeacherDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Lessons Published', val: myLessons.filter(l => l.status === 'published').length, icon: Upload,     color: '#E07A2F' },
-          { label: 'Lessons Pending',   val: myLessons.filter(l => l.status === 'pending').length,   icon: Clock,      color: '#7C5CBF' },
-          { label: 'Learners Reached',  val: totalViews.toLocaleString(),                             icon: Users,      color: '#3B9A8C' },
-          { label: 'Avg. Completion',   val: `${avgCompletion}%`,                                     icon: TrendingUp, color: '#F0A500' },
+          { label: 'Lessons Published', val: myLessons.filter(l => l.status === 'published').length, icon: Upload,     color: '#FF8A00' },
+          { label: 'Lessons Pending',   val: myLessons.filter(l => l.status === 'pending').length,   icon: Clock,      color: '#0D665F' },
+          { label: 'Learners Reached',  val: totalViews.toLocaleString(),                             icon: Users,      color: '#006E68' },
+          { label: 'Avg. Completion',   val: `${avgCompletion}%`,                                     icon: TrendingUp, color: '#F4B84C' },
         ].map(k => (
           <div key={k.label} className="bg-white rounded-2xl p-4 shadow-card">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: k.color + '20' }}>

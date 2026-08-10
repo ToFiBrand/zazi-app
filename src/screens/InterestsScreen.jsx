@@ -1,16 +1,18 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Briefcase, Code2, HeartHandshake, PenLine, TrendingUp, Newspaper, PiggyBank, FlaskConical, Check } from 'lucide-react'
+import Button from '../components/ui/Button'
+import ProgressBar from '../components/ui/ProgressBar'
 
 const INTERESTS = [
-  { id: 'career',   label: 'Career Development', emoji: '💼', color: '#E07A2F' },
-  { id: 'tech',     label: 'Tech & Coding',       emoji: '< >', color: '#3B9A8C' },
-  { id: 'health',   label: 'Mental Health',       emoji: '💜', color: '#7C5CBF' },
-  { id: 'poetry',   label: 'Poetry & Writing',    emoji: '✍️', color: '#E07A2F' },
-  { id: 'biz',      label: 'Entrepreneurship',    emoji: '📈', color: '#F0A500' },
-  { id: 'news',     label: 'Youth News',          emoji: '📰', color: '#3B9A8C' },
-  { id: 'finance',  label: 'Financial Literacy',  emoji: '💰', color: '#F0A500' },
-  { id: 'science',  label: 'Science & Maths',     emoji: '🔬', color: '#3B9A8C' },
+  { id: 'career',  label: 'Career Development', icon: Briefcase,      color: '#FF8A00' },
+  { id: 'tech',    label: 'Tech & Coding',       icon: Code2,          color: '#006E68' },
+  { id: 'health',  label: 'Mental Health',       icon: HeartHandshake, color: '#E8603C' },
+  { id: 'poetry',  label: 'Poetry & Writing',    icon: PenLine,        color: '#DE9E2E' },
+  { id: 'biz',     label: 'Entrepreneurship',    icon: TrendingUp,     color: '#0D665F' },
+  { id: 'news',    label: 'Youth News',          icon: Newspaper,      color: '#5F9770' },
+  { id: 'finance', label: 'Financial Literacy',  icon: PiggyBank,      color: '#F4B84C' },
+  { id: 'science', label: 'Science & Maths',     icon: FlaskConical,   color: '#006E68' },
 ]
 
 export default function InterestsScreen() {
@@ -23,55 +25,48 @@ export default function InterestsScreen() {
   return (
     <div className="min-h-screen md:min-h-0 bg-zazi-cream flex flex-col pb-8">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-5 pb-2">
+      <div className="flex items-center justify-between px-6 pt-6 pb-2">
         <button onClick={() => navigate('/signup')} className="flex items-center gap-1 text-zazi-navy">
           <ChevronLeft size={20} />
         </button>
         <button onClick={() => navigate('/home')} className="text-zazi-orange text-sm font-semibold">Skip</button>
       </div>
 
-      <div className="px-5">
-        <h1 className="text-2xl font-black text-zazi-navy mt-2">What interests you?</h1>
-        <p className="text-zazi-muted text-sm mt-1">Select topics you'd like to explore (choose at least 3)</p>
+      <div className="px-6">
+        <h1 className="text-2xl font-extrabold text-zazi-navy mt-2">What interests you?</h1>
+        <p className="text-zazi-navy/60 text-sm mt-1">Select topics you'd like to explore (choose at least 3)</p>
 
         {/* Progress bar */}
         <div className="mt-4 flex items-center gap-2">
-          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-zazi-orange rounded-full transition-all"
-              style={{ width: `${(selected.length / 6) * 100}%` }}
-            />
-          </div>
-          <span className="text-xs text-zazi-muted font-medium">{selected.length}/6</span>
+          <ProgressBar pct={(selected.length / 6) * 100} color="#FF8A00" />
+          <span className="text-xs text-zazi-navy/50 font-semibold whitespace-nowrap">{selected.length}/6</span>
         </div>
       </div>
 
       {/* Grid */}
-      <div className="px-5 mt-5 grid grid-cols-2 gap-3 flex-1">
-        {INTERESTS.map(({ id, label, emoji, color }) => {
+      <div className="px-6 mt-5 grid grid-cols-2 gap-3 flex-1">
+        {INTERESTS.map(({ id, label, icon: Icon, color }) => {
           const on = selected.includes(id)
           return (
             <button
               key={id}
               onClick={() => toggle(id)}
-              className="relative bg-white rounded-2xl p-4 flex flex-col items-start gap-3 text-left border-2 transition-all"
+              className="zazi-tap relative bg-white rounded-2xl p-4 flex flex-col items-start gap-3 text-left border-2 transition-all"
               style={{ borderColor: on ? color : 'transparent' }}
             >
-              {/* Check badge */}
               {on && (
                 <div
-                  className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center"
+                  className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center"
                   style={{ background: color }}
                 >
-                  <span className="text-white text-xs font-bold">✓</span>
+                  <Check size={13} strokeWidth={3} className="text-white" />
                 </div>
               )}
-              {/* Icon */}
               <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                style={{ background: color + '20' }}
+                className="w-11 h-11 rounded-xl flex items-center justify-center"
+                style={{ background: color + '1A' }}
               >
-                {emoji}
+                <Icon size={20} style={{ color }} />
               </div>
               <span className="text-zazi-navy font-bold text-sm leading-tight">{label}</span>
             </button>
@@ -80,18 +75,10 @@ export default function InterestsScreen() {
       </div>
 
       {/* CTA */}
-      <div className="px-5 mt-6">
-        <button
-          onClick={() => navigate('/home')}
-          disabled={selected.length < 3}
-          className={`w-full font-bold py-4 rounded-2xl text-base transition-all ${
-            selected.length >= 3
-              ? 'bg-zazi-orange text-white'
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-          }`}
-        >
+      <div className="px-6 mt-6">
+        <Button variant="primary" size="lg" full onClick={() => navigate('/home')} disabled={selected.length < 3}>
           Continue
-        </button>
+        </Button>
       </div>
     </div>
   )

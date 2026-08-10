@@ -75,10 +75,10 @@ export default function AdminDashboard() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {[
-                { label: 'Total Lessons',      val: publishedLessons.length, icon: GraduationCap, color: '#3B9A8C' },
-                { label: 'Student Content',    val: approvedContent.length,  icon: FileText,       color: '#E07A2F' },
-                { label: 'Pending Moderation', val: totalPending,            icon: Users,          color: '#7C5CBF' },
-                { label: 'Schools',            val: SCHOOLS.length,          icon: School,         color: '#F0A500' },
+                { label: 'Total Lessons',      val: publishedLessons.length, icon: GraduationCap, color: '#006E68' },
+                { label: 'Student Content',    val: approvedContent.length,  icon: FileText,       color: '#FF8A00' },
+                { label: 'Pending Moderation', val: totalPending,            icon: Users,          color: '#0D665F' },
+                { label: 'Schools',            val: SCHOOLS.length,          icon: School,         color: '#F4B84C' },
               ].map(k => (
                 <div key={k.label} className="bg-white rounded-2xl p-4 shadow-card">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: k.color + '20' }}>

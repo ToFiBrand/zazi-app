@@ -15,7 +15,7 @@ const INITIAL_USER = {
   schoolId: 'soweto-high',
   province: 'Gauteng',
   bio: 'Future software developer. Learning something new every week 🚀',
-  avatar: '👨🏾‍💻',
+  avatarId: 'thabo',
   points: 240,
 }
 

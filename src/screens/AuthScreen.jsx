@@ -1,65 +1,39 @@
 import { useNavigate } from 'react-router-dom'
+import Button from '../components/ui/Button'
 
 export default function AuthScreen() {
   const navigate = useNavigate()
   return (
     <div className="min-h-screen md:min-h-0 md:flex-1 flex flex-col bg-zazi-cream">
       {/* Logo */}
-      <div className="flex justify-center pt-10 pb-2">
-        <img src="/logo-v.png" alt="Zazi" className="h-16 object-contain" />
+      <div className="flex justify-center pt-12 pb-2">
+        <img src="/logo-v.svg" alt="Zazi" className="h-20 object-contain" />
       </div>
 
-      {/* Hero image placeholder */}
-      <div className="mx-5 rounded-3xl overflow-hidden" style={{ height: 220 }}>
-        <div className="w-full h-full flex items-end justify-center pb-0 relative"
-          style={{ background: 'linear-gradient(135deg, #3B9A8C 0%, #4DB6A6 40%, #E07A2F 100%)' }}>
-          {/* Decorative city bg */}
-          <div className="absolute bottom-0 left-0 right-0 flex items-end gap-1 px-4 opacity-20">
-            {[60,90,120,80,100,70,95,65].map((h,i) => (
-              <div key={i} className="flex-1 bg-white rounded-t" style={{ height: h }} />
-            ))}
-          </div>
-          {/* Characters */}
-          <div className="relative z-10 flex items-end gap-4 pb-0">
-            <div className="text-center">
-              <div className="w-24 h-32 rounded-t-2xl bg-white/20 flex items-end justify-center pb-2 backdrop-blur-sm">
-                <span className="text-5xl">👩🏾‍🎓</span>
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="w-24 h-28 rounded-t-2xl bg-white/20 flex items-end justify-center pb-2 backdrop-blur-sm">
-                <span className="text-5xl">👨🏾‍💻</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Hero image */}
+      <div className="mx-6 mt-4 rounded-[2rem] overflow-hidden bg-zazi-teal/10 flex items-end justify-center" style={{ height: 220 }}>
+        <img src="/pillars/career.svg" alt="" className="w-full h-full object-contain" />
       </div>
 
       {/* Tagline */}
-      <div className="px-6 pt-6 pb-2">
-        <h2 className="text-2xl font-black text-zazi-navy text-center">Welcome to Zazi</h2>
-        <p className="text-zazi-muted text-center text-sm mt-1">Your space to learn, create, and grow</p>
+      <div className="px-8 pt-7 pb-2">
+        <h1 className="text-2xl font-extrabold text-zazi-navy text-center leading-snug">Your space to learn, create and grow</h1>
+        <p className="text-zazi-navy/60 text-center text-sm mt-2">Join thousands of young South Africans building their future on Zazi.</p>
       </div>
 
       {/* Buttons */}
-      <div className="px-6 mt-6 space-y-3">
-        <button
-          onClick={() => navigate('/signup')}
-          className="w-full bg-zazi-orange text-white font-bold py-4 rounded-2xl text-base shadow-md"
-        >
+      <div className="px-7 mt-6 space-y-3">
+        <Button variant="primary" size="lg" full onClick={() => navigate('/signup')}>
           Sign Up
-        </button>
-        <button
-          onClick={() => navigate('/home')}
-          className="w-full border-2 border-zazi-orange text-zazi-orange font-bold py-4 rounded-2xl text-base"
-        >
+        </Button>
+        <Button variant="secondary" size="lg" full onClick={() => navigate('/home')}>
           Log In
-        </button>
+        </Button>
       </div>
 
-      <p className="text-zazi-muted text-xs text-center mt-6 px-6">
+      <p className="text-zazi-navy/40 text-xs text-center mt-6 px-6 pb-8">
         By continuing, you agree to our{' '}
-        <span className="text-zazi-orange">Terms & Privacy Policy</span>
+        <span className="text-zazi-teal font-semibold">Terms &amp; Privacy Policy</span>
       </p>
     </div>
   )

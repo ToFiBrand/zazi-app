@@ -3,11 +3,11 @@ import { ChevronLeft, CheckCircle2, XCircle, Trophy, GraduationCap, Bell } from 
 import { useApp } from '../context/AppContext'
 
 const TYPE_STYLE = {
-  completion:      { icon: CheckCircle2,   color: '#3B9A8C', bg: '#e8f5f2' },
-  approved:        { icon: CheckCircle2,   color: '#16a34a', bg: '#dcfce7' },
-  rejected:        { icon: XCircle,        color: '#dc2626', bg: '#fde8e8' },
-  challenge:       { icon: Trophy,         color: '#F0A500', bg: '#fdf3e0' },
-  'lesson-approved': { icon: GraduationCap, color: '#7C5CBF', bg: '#f0eaf9' },
+  completion:      { icon: CheckCircle2,   color: '#006E68', bg: '#006E6814' },
+  approved:        { icon: CheckCircle2,   color: '#5F9770', bg: '#5F977020' },
+  rejected:        { icon: XCircle,        color: '#C94B2B', bg: '#E8603C1A' },
+  challenge:       { icon: Trophy,         color: '#DE9E2E', bg: '#F4B84C22' },
+  'lesson-approved': { icon: GraduationCap, color: '#0D665F', bg: '#0D665F16' },
   'lesson-rejected': { icon: GraduationCap, color: '#6b7280', bg: '#f3f4f6' },
 }
 

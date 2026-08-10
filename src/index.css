@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -8,8 +8,8 @@
 
 body {
   margin: 0;
-  background: #1C2B3A;
-  font-family: 'Inter', system-ui, sans-serif;
+  background: #17283A;
+  font-family: 'Poppins', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -23,4 +23,14 @@ body {
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* Custom range slider */
-input[type="range"] { accent-color: #E07A2F; }
+input[type="range"] { accent-color: #FF8A00; }
+
+/* Subtle card lift on hover/press — used by the Card component */
+.zazi-tap { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.zazi-tap:active { transform: scale(0.97); }
+
+@keyframes zazi-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.zazi-fade-up { animation: zazi-fade-up 0.35s ease both; }

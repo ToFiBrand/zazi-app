@@ -1,15 +1,16 @@
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, FileText, Video, Sparkles, Trophy, Lightbulb, ChevronRight } from 'lucide-react'
+import { ChevronLeft, FileText, Video, Sparkles, Trophy, Lightbulb, ChevronRight, Sparkle } from 'lucide-react'
 import { CONTENT_TYPES } from '../data/content'
 import { useApp } from '../context/AppContext'
+import { Card } from '../components/ui'
 
 const ICONS = { post: FileText, video: Video, story: Sparkles, challenge: Trophy, idea: Lightbulb }
 const COLORS = {
-  post: { color: '#3B9A8C', bg: '#3B9A8C20' },
-  video: { color: '#E07A2F', bg: '#E07A2F20' },
-  story: { color: '#7C5CBF', bg: '#7C5CBF20' },
-  challenge: { color: '#F0A500', bg: '#F0A50020' },
-  idea: { color: '#2D7A6E', bg: '#2D7A6E20' },
+  post: '#006E68',
+  video: '#FF8A00',
+  story: '#F4B84C',
+  challenge: '#E8603C',
+  idea: '#0D665F',
 }
 
 export default function CreateContentScreen() {
@@ -19,18 +20,18 @@ export default function CreateContentScreen() {
   return (
     <div className="min-h-screen bg-zazi-cream pb-8">
       {/* Header */}
-      <div className="flex items-center gap-2 px-5 pt-5 pb-4">
-        <button onClick={() => navigate('/home')} className="w-8 h-8 flex items-center">
+      <div className="flex items-center gap-2 px-6 pt-6 pb-4">
+        <button onClick={() => navigate('/home')} className="w-9 h-9 flex items-center justify-center -ml-1.5">
           <ChevronLeft size={20} className="text-zazi-navy" />
         </button>
         <div>
-          <h2 className="text-xl font-black text-zazi-navy">What do you want to create?</h2>
-          <p className="text-zazi-muted text-xs">Your voice belongs on Zazi</p>
+          <h1 className="text-xl font-extrabold text-zazi-navy">What do you want to create?</h1>
+          <p className="text-zazi-navy/50 text-xs mt-0.5">Your voice belongs on Zazi</p>
         </div>
       </div>
 
       {/* Creator stats */}
-      <div className="mx-5 rounded-2xl p-4" style={{ background: 'linear-gradient(135deg, #E07A2F, #F0A500)' }}>
+      <div className="mx-6 rounded-3xl p-5" style={{ background: 'linear-gradient(135deg, #FF8A00, #F4B84C)' }}>
         <p className="text-white font-bold text-sm mb-3">Your Creator Stats</p>
         <div className="flex gap-6">
           {[
@@ -39,45 +40,46 @@ export default function CreateContentScreen() {
             { label: 'Lessons Done', val: stats.lessonsCompleted },
           ].map(s => (
             <div key={s.label} className="text-center">
-              <p className="text-white font-black text-2xl">{s.val}</p>
-              <p className="text-white/70 text-xs">{s.label}</p>
+              <p className="text-white font-extrabold text-2xl">{s.val}</p>
+              <p className="text-white/75 text-xs">{s.label}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* What to create */}
-      <div className="px-5 mt-6">
+      <div className="px-6 mt-6">
         <div className="space-y-3">
-          {CONTENT_TYPES.map(({ id, label, sub, emoji }) => {
+          {CONTENT_TYPES.map(({ id, label, sub }) => {
             const Icon = ICONS[id]
-            const { color, bg } = COLORS[id]
+            const color = COLORS[id]
             return (
-              <button
+              <Card
                 key={id}
+                as="button"
                 onClick={() => navigate(`/create/${id}`)}
-                className="w-full bg-white rounded-2xl p-4 flex items-center gap-4 shadow-card"
+                className="w-full p-4 flex items-center gap-4 text-left"
               >
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: bg }}>
-                  <Icon size={20} style={{ color }} />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: color + '16' }}>
+                  <Icon size={21} style={{ color }} />
                 </div>
-                <div className="flex-1 text-left">
-                  <p className="text-zazi-navy font-bold text-sm">{emoji} {label}</p>
-                  <p className="text-zazi-muted text-xs">{sub}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-zazi-navy font-bold text-sm">{label}</p>
+                  <p className="text-zazi-navy/50 text-xs mt-0.5">{sub}</p>
                 </div>
-                <ChevronRight size={16} className="text-zazi-orange" />
-              </button>
+                <ChevronRight size={17} className="text-zazi-orange flex-shrink-0" />
+              </Card>
             )
           })}
         </div>
       </div>
 
       {/* Creator tip */}
-      <div className="mx-5 mt-5 bg-zazi-teal/10 rounded-2xl p-4">
-        <p className="text-zazi-teal font-bold text-xs flex items-center gap-1">
-          <span>💡</span> Creator Tip
+      <div className="mx-6 mt-5 bg-zazi-teal/8 rounded-2xl p-4" style={{ background: '#006E680D' }}>
+        <p className="text-zazi-teal font-bold text-xs flex items-center gap-1.5">
+          <Sparkle size={13} className="fill-zazi-teal" /> Creator Tip
         </p>
-        <p className="text-zazi-navy/70 text-xs mt-1">
+        <p className="text-zazi-navy/60 text-xs mt-1.5 leading-relaxed">
           Every submission is reviewed by the Zazi team before it goes public — that's how we keep this space safe and credible.
         </p>
       </div>

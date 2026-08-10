@@ -5,31 +5,45 @@ export default {
     extend: {
       colors: {
         zazi: {
-          orange:       '#E07A2F',
-          'orange-light': '#F5915A',
-          'orange-dark':  '#C4661F',
-          teal:         '#3B9A8C',
-          'teal-light': '#4DB6A6',
-          'teal-dark':  '#2D7A6E',
-          purple:       '#7C5CBF',
-          'purple-light':'#9B7DD4',
-          gold:         '#F0A500',
-          cream:        '#FAF8F2',
-          navy:         '#1C2B3A',
-          'navy-light': '#2D3F52',
-          muted:        '#8A9BB0',
-          'input-bg':   '#F0EDE8',
+          // Primary action colour
+          orange:        '#FF8A00',
+          'orange-light': '#FFA53D',
+          'orange-dark':  '#E67A00',
+          // Deep teal — headings, secondary actions, digital pillar
+          teal:          '#006E68',
+          'teal-light':   '#4B9992',
+          'teal-dark':    '#0D665F',
+          // Warm yellow — finance pillar, badges, highlights
+          gold:          '#F4B84C',
+          'gold-dark':    '#DE9E2E',
+          // Soft green — civic/community pillar, positive status
+          green:         '#9BC9A7',
+          'green-dark':   '#5F9770',
+          // Coral — entrepreneurship pillar accent
+          coral:         '#E8603C',
+          'coral-dark':   '#C94B2B',
+          // Warm neutrals
+          cream:         '#F8F1DF',
+          'cream-dark':   '#EFE4C9',
+          navy:          '#17283A',
+          'navy-light':   '#243B52',
+          muted:         '#6E7A8A',
+          'input-bg':    '#F1E8D3',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Poppins', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        card: '0 2px 12px rgba(28,43,58,0.08)',
-        'card-hover': '0 4px 20px rgba(28,43,58,0.14)',
+        card: '0 2px 14px rgba(23,40,58,0.07)',
+        'card-hover': '0 8px 28px rgba(23,40,58,0.14)',
+        soft: '0 1px 3px rgba(23,40,58,0.06)',
+      },
+      borderRadius: {
+        '4xl': '2rem',
+        '5xl': '2.5rem',
       },
     },
   },
   plugins: [],
 }
-
