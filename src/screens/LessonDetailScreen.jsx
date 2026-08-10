@@ -5,6 +5,11 @@ import { PILLARS } from '../data/pillars'
 import { useApp } from '../context/AppContext'
 import { Avatar, Card, Chip, Button } from '../components/ui'
 
+const DISCUSSION_REPLIES = [
+  { id: 1, user: 'Zanele P.', avatarId: 'zanele', text: 'This really helped me understand where to start!', time: '3h ago' },
+  { id: 2, user: 'Dumisani K.', avatarId: 'dumisani', text: "Didn't expect this to be so practical — trying it this week.", time: '1d ago' },
+]
+
 export default function LessonDetailScreen() {
   const navigate = useNavigate()
   const { lessonId } = useParams()
@@ -128,6 +133,20 @@ export default function LessonDetailScreen() {
             <MessageCircle size={15} /> Discussion
           </h3>
           <p className="text-zazi-navy/60 text-sm italic mb-3">{lesson.discussion}</p>
+          <div className="space-y-3 mb-3">
+            {DISCUSSION_REPLIES.map(r => (
+              <div key={r.id} className="flex gap-2.5">
+                <Avatar avatarId={r.avatarId} size="xs" />
+                <div className="flex-1 bg-white rounded-2xl rounded-tl-sm p-3 shadow-soft">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-zazi-navy font-bold text-xs">{r.user}</span>
+                    <span className="text-zazi-navy/35 text-[10px]">{r.time}</span>
+                  </div>
+                  <p className="text-zazi-navy/65 text-xs">{r.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
           <div className="flex items-center gap-2">
             <Avatar avatarId={user.avatarId} size="xs" />
             <input

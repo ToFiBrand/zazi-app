@@ -32,7 +32,7 @@ export default function ProfileScreen() {
   return (
     <div className="min-h-screen bg-zazi-cream pb-[76px] md:pb-10">
       {/* Header bg */}
-      <div className="h-28 relative rounded-b-[2.5rem]" style={{ background: 'linear-gradient(135deg, #FF8A00, #F4B84C)' }}>
+      <div className="h-36 relative rounded-b-[2.5rem]" style={{ background: 'linear-gradient(135deg, #FF8A00, #F4B84C)' }}>
         <div className="absolute top-5 right-6">
           <button className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
             <Settings size={16} className="text-white" />
@@ -41,9 +41,9 @@ export default function ProfileScreen() {
       </div>
 
       {/* Avatar */}
-      <div className="px-6 -mt-11 relative z-10">
+      <div className="px-6 -mt-16 relative z-10">
         <div className="flex items-end justify-between">
-          <Avatar avatarId={user.avatarId} size="xl" ring />
+          <Avatar avatarId={user.avatarId} size="2xl" ring />
           <div className="flex gap-2 mb-1.5">
             <Button variant="primary" size="sm">Edit Profile</Button>
             <button className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-soft">

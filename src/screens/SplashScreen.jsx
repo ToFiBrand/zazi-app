@@ -19,7 +19,7 @@ export default function SplashScreen() {
       }}
     >
       <div className="relative z-10 flex flex-col items-center gap-5 zazi-fade-up">
-        <img src="/logo-v.svg" alt="Zazi" className="w-40 h-auto drop-shadow-sm" />
+        <img src="/logo-v.svg" alt="Zazi" className="w-64 h-auto drop-shadow-sm" />
         <p className="text-zazi-navy/70 text-base font-medium tracking-wide">Know Yourself. Grow Yourself.</p>
       </div>
 

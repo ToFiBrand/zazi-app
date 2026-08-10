@@ -19,7 +19,7 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-60 bg-zazi-navy px-4 py-6 z-40">
       <div className="flex items-center gap-2 px-2 mb-8">
-        <img src="/logo-h.svg" alt="Zazi" className="h-8 object-contain" />
+        <img src="/logo-h.svg" alt="Zazi" className="h-11 object-contain" />
       </div>
 
       <nav className="flex-1 space-y-1">

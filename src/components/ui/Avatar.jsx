@@ -6,6 +6,7 @@ const SIZES = {
   md: 'w-12 h-12',
   lg: 'w-16 h-16',
   xl: 'w-24 h-24',
+  '2xl': 'w-32 h-32',
 }
 
 export default function Avatar({ avatarId, size = 'md', ring = false, className = '' }) {

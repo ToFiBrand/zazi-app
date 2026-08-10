@@ -6,17 +6,17 @@ export default function AuthScreen() {
   return (
     <div className="min-h-screen md:min-h-0 md:flex-1 flex flex-col bg-zazi-cream">
       {/* Logo */}
-      <div className="flex justify-center pt-12 pb-2">
-        <img src="/logo-v.svg" alt="Zazi" className="h-20 object-contain" />
+      <div className="flex justify-center pt-10 pb-1">
+        <img src="/logo-v.svg" alt="Zazi" className="h-28 object-contain" />
       </div>
 
       {/* Hero image */}
-      <div className="mx-6 mt-4 rounded-[2rem] overflow-hidden bg-zazi-teal/10 flex items-end justify-center" style={{ height: 220 }}>
-        <img src="/pillars/career.svg" alt="" className="w-full h-full object-contain" />
+      <div className="px-4 flex items-center justify-center" style={{ height: 260 }}>
+        <img src="/hero/onboarding-hero.svg" alt="" className="w-full h-full object-contain mix-blend-multiply" />
       </div>
 
       {/* Tagline */}
-      <div className="px-8 pt-7 pb-2">
+      <div className="px-8 pt-4 pb-2">
         <h1 className="text-2xl font-extrabold text-zazi-navy text-center leading-snug">Your space to learn, create and grow</h1>
         <p className="text-zazi-navy/60 text-center text-sm mt-2">Join thousands of young South Africans building their future on Zazi.</p>
       </div>

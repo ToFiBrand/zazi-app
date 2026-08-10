@@ -14,7 +14,7 @@ const FEATURES = [
 
 const SLIDES = [
   {
-    art: '/pillars/career.svg',
+    art: '/hero/onboarding-hero.svg',
     title: 'Welcome to Zazi',
     body: 'The city of your future, where current affairs, news, knowledge, culture and creativity collide.',
     sub: "Step in, speak up and shape the world that's waiting for you.",
@@ -44,17 +44,17 @@ export default function OnboardingScreen() {
     <div className="min-h-screen md:min-h-0 md:flex-1 flex flex-col bg-zazi-cream">
       {/* Top */}
       <div className="flex justify-between items-center px-6 pt-6">
-        <img src="/logo-h.svg" alt="Zazi" className="h-7 object-contain" />
+        <img src="/logo-h.svg" alt="Zazi" className="h-10 object-contain" />
         <button onClick={() => navigate('/login')} className="text-zazi-navy/50 text-sm font-semibold">Skip</button>
       </div>
 
       {/* Hero art */}
-      <div className="px-8 mt-4 flex-shrink-0" key={slide}>
-        <img src={s.art} alt="" className="w-full h-52 object-contain zazi-fade-up" />
+      <div className="px-4 mt-2 flex-shrink-0" key={slide}>
+        <img src={s.art} alt="" className="w-full h-72 object-contain zazi-fade-up mix-blend-multiply" />
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-7 pt-6 pb-2 flex flex-col min-h-0" key={`content-${slide}`}>
+      <div className="flex-1 px-7 pt-4 pb-2 flex flex-col min-h-0" key={`content-${slide}`}>
         {s.subtitle && (
           <p className="text-zazi-teal font-bold text-base mb-1 zazi-fade-up">{s.subtitle}</p>
         )}
