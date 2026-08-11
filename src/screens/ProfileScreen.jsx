@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Settings, Share2, Grid, Clock } from 'lucide-react'
+import { Settings, Share2, Grid, Clock, PartyPopper, Compass, Palette } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { CONTENT_TYPES } from '../data/content'
 import { Avatar, Card, Button, ProgressBar } from '../components/ui'
@@ -23,9 +23,9 @@ export default function ProfileScreen() {
 
   const badges = useMemo(() => {
     const list = []
-    if (stats.lessonsCompleted >= 1) list.push({ label: 'First Lesson Complete', emoji: '🎉', color: '#FF8A00' })
-    if (stats.lessonsCompleted >= 3) list.push({ label: 'Career Explorer', emoji: '🧭', color: '#006E68' })
-    if (stats.creations >= 1) list.push({ label: 'Zazi Creator', emoji: '🎨', color: '#0D665F' })
+    if (stats.lessonsCompleted >= 1) list.push({ label: 'First Lesson Complete', icon: PartyPopper, color: '#FF8A00' })
+    if (stats.lessonsCompleted >= 3) list.push({ label: 'Career Explorer', icon: Compass, color: '#006E68' })
+    if (stats.creations >= 1) list.push({ label: 'Zazi Creator', icon: Palette, color: '#0D665F' })
     return list
   }, [stats])
 
@@ -61,28 +61,28 @@ export default function ProfileScreen() {
         </div>
 
         {/* My Zazi Journey */}
-        <Card className="mt-4 p-4">
-          <p className="text-zazi-navy font-extrabold text-sm mb-3">My Zazi Journey</p>
-          <div className="flex gap-6">
+        <div className="mt-4 p-5 rounded-3xl bg-zazi-navy">
+          <p className="text-white font-extrabold text-sm mb-3">My Zazi Journey</p>
+          <div className="flex gap-7">
             {[
               { label: 'Lessons', val: stats.lessonsCompleted },
               { label: 'Creations', val: stats.creations },
               { label: 'Challenges', val: stats.challengesCompleted },
             ].map(s => (
               <div key={s.label}>
-                <p className="text-zazi-navy font-extrabold text-xl">{s.val}</p>
-                <p className="text-zazi-navy/45 text-[11px]">{s.label}</p>
+                <p className="text-zazi-gold font-extrabold text-2xl">{s.val}</p>
+                <p className="text-white/50 text-[11px] mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
-        </Card>
+        </div>
 
         {/* Badges */}
         {badges.length > 0 && (
           <div className="flex gap-2 mt-3 flex-wrap">
             {badges.map(b => (
-              <span key={b.label} className="text-[10px] font-bold px-3 py-1.5 rounded-full text-white" style={{ background: b.color }}>
-                {b.emoji} {b.label}
+              <span key={b.label} className="flex items-center gap-1 text-[10px] font-bold px-3 py-1.5 rounded-full text-white" style={{ background: b.color }}>
+                <b.icon size={11} /> {b.label}
               </span>
             ))}
           </div>
@@ -145,7 +145,7 @@ export default function ProfileScreen() {
               return (
                 <Card key={item.id} className="p-3 flex gap-3 items-center">
                   <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: item.color + '1C' }}>
-                    <span className="text-2xl">{typeInfo?.emoji}</span>
+                    {typeInfo && <typeInfo.icon size={22} style={{ color: item.color }} />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-zazi-navy font-bold text-sm truncate">{item.title}</p>

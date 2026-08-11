@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Search, Clock } from 'lucide-react'
+import { Search, Clock, Check } from 'lucide-react'
 import { PILLARS } from '../data/pillars'
 import { useApp } from '../context/AppContext'
 import { Card, Chip, Avatar, ProgressBar } from '../components/ui'
@@ -148,7 +148,7 @@ function LessonRow({ lesson, progress, onClick }) {
       >
         <pillar.icon size={22} className="text-white/85" />
         {progress?.completed && (
-          <div className="absolute inset-0 bg-black/30 flex items-center justify-center text-white text-xs font-bold">✓</div>
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center"><Check size={18} strokeWidth={3} className="text-white" /></div>
         )}
       </div>
       <div className="flex-1 min-w-0">

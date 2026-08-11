@@ -131,7 +131,7 @@ export default function AdminDashboard() {
                     return (
                       <div key={item.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                         <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: item.color + '20' }}>
-                          <span className="text-lg">{typeInfo?.emoji}</span>
+                          {typeInfo && <typeInfo.icon size={18} style={{ color: item.color }} />}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-zazi-navy font-bold text-sm truncate">{item.title}</p>

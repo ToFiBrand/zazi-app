@@ -156,15 +156,15 @@ export default function HomeScreen() {
 
       {/* Sponsor Spotlight */}
       <section className="mt-5 mx-6 mb-2">
-        <div className="bg-white rounded-2xl p-3.5 flex items-center gap-3 shadow-soft">
-          <div className="w-10 h-10 bg-zazi-navy rounded-xl flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-xs font-bold">SB</span>
+        <div className="bg-zazi-navy rounded-2xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
+            <span className="text-zazi-gold text-xs font-bold">SB</span>
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] text-zazi-navy/40 uppercase tracking-wider font-semibold flex items-center gap-1">
+            <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1">
               <Clock size={10} /> Sponsor Spotlight
             </p>
-            <p className="text-zazi-navy text-xs font-bold truncate">Standard Bank · Powering Financial Literacy for 24,000+ learners</p>
+            <p className="text-white text-xs font-bold truncate">Standard Bank · Powering Financial Literacy for 24,000+ learners</p>
           </div>
         </div>
       </section>

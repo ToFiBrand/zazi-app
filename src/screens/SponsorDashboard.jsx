@@ -74,7 +74,7 @@ export default function SponsorDashboard() {
             {pillarImpact.map(p => (
               <div key={p.id}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-zazi-navy text-sm font-medium">{p.emoji} {p.short}</span>
+                  <span className="text-zazi-navy text-sm font-medium flex items-center gap-1.5"><p.icon size={13} style={{ color: p.color }} />{p.short}</span>
                   <span className="text-zazi-muted text-[10px]">{p.learners.toLocaleString()} learners</span>
                 </div>
                 <div className="h-3 bg-gray-100 rounded-full overflow-hidden">

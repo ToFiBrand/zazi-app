@@ -5,7 +5,7 @@ import { EXPLORE_CATEGORIES, CONTENT_TYPES } from '../data/content'
 import { useApp } from '../context/AppContext'
 import { Avatar } from '../components/ui'
 
-const TYPE_ICON = Object.fromEntries(CONTENT_TYPES.map(t => [t.id, t.emoji]))
+const TYPE_ICON = Object.fromEntries(CONTENT_TYPES.map(t => [t.id, t.icon]))
 
 export default function ExploreScreen() {
   const navigate = useNavigate()
@@ -60,10 +60,12 @@ export default function ExploreScreen() {
         </div>
       ) : (
         <div className="px-6 mt-4 grid grid-cols-2 md:grid-cols-3 gap-3">
-          {filtered.map(item => (
+          {filtered.map(item => {
+            const TypeIcon = TYPE_ICON[item.type]
+            return (
             <button key={item.id} onClick={() => navigate(`/explore/${item.id}`)} className="zazi-tap text-left">
               <div className="w-full rounded-2xl relative overflow-hidden flex items-center justify-center" style={{ height: 130, background: item.color + '1C' }}>
-                <span className="text-4xl">{TYPE_ICON[item.type] || '✨'}</span>
+                {TypeIcon && <TypeIcon size={34} style={{ color: item.color }} />}
                 <div className="absolute top-2 right-2 bg-black/25 backdrop-blur rounded-full px-2 py-0.5 flex items-center gap-1">
                   <Eye size={10} className="text-white" />
                   <span className="text-white text-[9px] font-medium">{item.views}</span>
@@ -79,7 +81,8 @@ export default function ExploreScreen() {
                 <span className="text-zazi-navy/40 text-[10px]">{item.likes}</span>
               </div>
             </button>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

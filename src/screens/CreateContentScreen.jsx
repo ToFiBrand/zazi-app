@@ -1,10 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, FileText, Video, Sparkles, Trophy, Lightbulb, ChevronRight, Sparkle } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Sparkle } from 'lucide-react'
 import { CONTENT_TYPES } from '../data/content'
 import { useApp } from '../context/AppContext'
 import { Card } from '../components/ui'
 
-const ICONS = { post: FileText, video: Video, story: Sparkles, challenge: Trophy, idea: Lightbulb }
 const COLORS = {
   post: '#006E68',
   video: '#FF8A00',
@@ -50,8 +49,7 @@ export default function CreateContentScreen() {
       {/* What to create */}
       <div className="px-6 mt-6">
         <div className="space-y-3">
-          {CONTENT_TYPES.map(({ id, label, sub }) => {
-            const Icon = ICONS[id]
+          {CONTENT_TYPES.map(({ id, label, sub, icon: Icon }) => {
             const color = COLORS[id]
             return (
               <Card

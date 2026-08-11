@@ -1,11 +1,13 @@
+import { PenLine, Video, BookOpen, Rocket, Lightbulb } from 'lucide-react'
+
 // Seed student-generated content. New submissions created in-app are appended
 // via AppContext and start life with status: 'pending'.
 export const CONTENT_TYPES = [
-  { id: 'post', label: 'Post', sub: 'Share your thoughts', emoji: '✍🏾' },
-  { id: 'video', label: 'Video', sub: 'Upload a short video', emoji: '🎥' },
-  { id: 'story', label: 'Story', sub: 'Tell your story', emoji: '📖' },
-  { id: 'challenge', label: 'Challenge', sub: 'Take on a Zazi challenge', emoji: '🚀' },
-  { id: 'idea', label: 'Idea', sub: 'Share an idea that could change something', emoji: '💡' },
+  { id: 'post', label: 'Post', sub: 'Share your thoughts', icon: PenLine },
+  { id: 'video', label: 'Video', sub: 'Upload a short video', icon: Video },
+  { id: 'story', label: 'Story', sub: 'Tell your story', icon: BookOpen },
+  { id: 'challenge', label: 'Challenge', sub: 'Take on a Zazi challenge', icon: Rocket },
+  { id: 'idea', label: 'Idea', sub: 'Share an idea that could change something', icon: Lightbulb },
 ]
 
 export const EXPLORE_CATEGORIES = [

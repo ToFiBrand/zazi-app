@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, Heart, MessageCircle, Share2 } from 'lucide-react'
+import { ChevronLeft, Heart, MessageCircle, Share2, SearchX, Sparkles } from 'lucide-react'
 import { CONTENT_TYPES } from '../data/content'
 import { PILLARS } from '../data/pillars'
 import { useApp } from '../context/AppContext'
@@ -27,7 +27,7 @@ export default function ContentViewScreen() {
   if (!item) {
     return (
       <div className="min-h-screen bg-zazi-cream flex flex-col items-center justify-center px-8 text-center">
-        <p className="text-3xl mb-2">🔍</p>
+        <SearchX size={30} className="text-zazi-navy/30 mb-2" />
         <h2 className="text-lg font-extrabold text-zazi-navy">This story isn't available</h2>
         <p className="text-zazi-navy/50 text-sm mt-1">It may still be under review, or the link is out of date.</p>
         <Button variant="primary" className="mt-5" onClick={() => navigate('/explore')}>Back to Explore</Button>
@@ -45,7 +45,7 @@ export default function ContentViewScreen() {
         <button onClick={() => navigate('/explore')} className="absolute top-4 left-4 w-9 h-9 bg-black/20 backdrop-blur rounded-full flex items-center justify-center">
           <ChevronLeft size={18} className="text-white" />
         </button>
-        <span className="text-7xl">{typeInfo?.emoji || '✨'}</span>
+        {typeInfo ? <typeInfo.icon size={56} style={{ color: item.color }} /> : <Sparkles size={56} className="text-zazi-navy/30" />}
       </div>
 
       {/* Content */}

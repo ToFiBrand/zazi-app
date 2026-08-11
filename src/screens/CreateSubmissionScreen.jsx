@@ -66,7 +66,9 @@ export default function CreateSubmissionScreen() {
           <button onClick={() => navigate('/create')} className="w-9 h-9 flex items-center justify-center">
             <X size={20} className="text-zazi-navy" />
           </button>
-          <h2 className="text-base font-extrabold text-zazi-navy">New {typeInfo.label} {typeInfo.emoji}</h2>
+          <h2 className="text-base font-extrabold text-zazi-navy flex items-center gap-1.5">
+            <typeInfo.icon size={16} className="text-zazi-orange" /> New {typeInfo.label}
+          </h2>
           <div className="w-9" />
         </div>
       </div>

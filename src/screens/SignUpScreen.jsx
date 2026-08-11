@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronDown, ChevronLeft } from 'lucide-react'
+import { ChevronDown, ChevronLeft, Check } from 'lucide-react'
 import { SCHOOLS } from '../data/schools'
 import { useApp } from '../context/AppContext'
 import Button from '../components/ui/Button'
@@ -132,7 +132,7 @@ export default function SignUpScreen() {
               agreed ? 'bg-zazi-orange border-zazi-orange' : 'border-gray-300 bg-white'
             }`}
           >
-            {agreed && <span className="text-white text-xs font-bold">✓</span>}
+            {agreed && <Check size={12} strokeWidth={3} className="text-white" />}
           </div>
           <span className="text-sm text-zazi-navy/70">
             I agree to the{' '}

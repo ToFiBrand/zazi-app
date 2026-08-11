@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, Play, Clock, Download, CheckCircle2, MessageCircle, Zap } from 'lucide-react'
+import { ChevronLeft, Play, Clock, Download, CheckCircle2, MessageCircle, Zap, SearchX } from 'lucide-react'
 import { PILLARS } from '../data/pillars'
 import { useApp } from '../context/AppContext'
 import { Avatar, Card, Chip, Button } from '../components/ui'
@@ -38,7 +38,7 @@ export default function LessonDetailScreen() {
   if (!lesson) {
     return (
       <div className="min-h-screen bg-zazi-cream flex flex-col items-center justify-center px-8 text-center">
-        <p className="text-3xl mb-2">🔍</p>
+        <SearchX size={30} className="text-zazi-navy/30 mb-2" />
         <h2 className="text-lg font-extrabold text-zazi-navy">Lesson not found</h2>
         <p className="text-zazi-navy/50 text-sm mt-1">This lesson may have been removed or the link is out of date.</p>
         <Button variant="primary" className="mt-5" onClick={() => navigate('/learn')}>Back to Learn</Button>

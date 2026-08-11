@@ -102,7 +102,7 @@ export default function TeacherDashboard() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
                       <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: lesson.color + '20' }}>
-                        <span className="text-xl">📹</span>
+                        <pillar.icon size={20} style={{ color: lesson.color }} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-zazi-navy font-bold text-sm truncate">{lesson.title}</p>

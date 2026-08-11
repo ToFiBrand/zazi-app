@@ -16,7 +16,9 @@ const SLIDES = [
   {
     art: '/hero/onboarding-hero.svg',
     title: 'Welcome to Zazi',
-    body: 'The city of your future, where current affairs, news, knowledge, culture and creativity collide.',
+    intro: 'The city of your future, where',
+    focusWords: ['Current Affairs', 'News', 'Knowledge', 'Culture', 'Creativity'],
+    outro: 'collide.',
     sub: "Step in, speak up and shape the world that's waiting for you.",
   },
   {
@@ -60,7 +62,27 @@ export default function OnboardingScreen() {
         )}
         <h1 className="text-3xl font-extrabold text-zazi-navy mb-3 leading-tight zazi-fade-up">{s.title}</h1>
 
-        {s.features ? (
+        {s.focusWords ? (
+          <div className="mb-2">
+            <p className="text-zazi-navy/70 text-base leading-relaxed zazi-fade-up">{s.intro}</p>
+            <div className="my-1">
+              {s.focusWords.map((w, i) => (
+                <div key={w}>
+                  <p
+                    className="text-zazi-orange font-extrabold text-2xl leading-[1.15] zazi-fade-up"
+                    style={{ animationDelay: `${i * 60}ms` }}
+                  >
+                    {w}
+                  </p>
+                  {i < s.focusWords.length - 1 && (
+                    <p className="text-zazi-orange/25 font-bold text-sm leading-none my-0.5">|</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-zazi-navy/70 text-base leading-relaxed zazi-fade-up">{s.outro}</p>
+          </div>
+        ) : s.features ? (
           <ul className="space-y-3 mb-4">
             {FEATURES.map((f, i) => (
               <li key={i} className="flex items-center gap-3 text-zazi-navy text-sm font-medium zazi-fade-up" style={{ animationDelay: `${i * 40}ms` }}>
