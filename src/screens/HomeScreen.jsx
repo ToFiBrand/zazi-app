@@ -61,7 +61,7 @@ export default function HomeScreen() {
         <section className="mt-6 px-6">
           <Card as="div" className="w-full overflow-hidden">
             <div className="h-64 flex items-center justify-center relative bg-white">
-              <img src={featuredPillar.art} alt="" className="w-full h-full object-contain scale-110" />
+              <img src="/hero/build-your-future.png" alt="" className="w-full h-full object-contain" />
               <div className="absolute top-3 left-3">
                 <Chip color={featuredPillar.color} tone="solid">{featuredPillar.short.toUpperCase()}</Chip>
               </div>
