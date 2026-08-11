@@ -14,7 +14,7 @@ const FEATURES = [
 
 const SLIDES = [
   {
-    art: '/hero/onboarding-hero.svg',
+    art: '/hero/welcome.png',
     title: 'Welcome to Zazi',
     intro: 'The city of your future, where',
     focusWords: ['Current Affairs', 'News', 'Knowledge', 'Culture', 'Creativity'],
@@ -22,13 +22,13 @@ const SLIDES = [
     sub: "Step in, speak up and shape the world that's waiting for you.",
   },
   {
-    art: '/pillars/civic.svg',
+    art: '/hero/what-youll-find.png',
     title: "What You'll Find Here",
     features: true,
     sub: "Let's explore what matters.",
   },
   {
-    art: '/pillars/leadership.svg',
+    art: '/hero/you-belong.png',
     title: 'You Belong Here',
     subtitle: 'Zazi means "to know yourself"',
     body: "This is a platform made by youth, for youth. Here, your voice matters. Your ideas matter. Your story matters.",
@@ -52,7 +52,7 @@ export default function OnboardingScreen() {
 
       {/* Hero art */}
       <div className="px-4 mt-2 flex-shrink-0" key={slide}>
-        <img src={s.art} alt="" className="w-full h-72 object-contain zazi-fade-up mix-blend-multiply" />
+        <img src={s.art} alt="" className="w-full h-72 object-contain zazi-fade-up" />
       </div>
 
       {/* Content */}

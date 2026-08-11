@@ -12,7 +12,7 @@ export default function AuthScreen() {
 
       {/* Hero image */}
       <div className="px-4 flex items-center justify-center" style={{ height: 260 }}>
-        <img src="/hero/onboarding-hero.svg" alt="" className="w-full h-full object-contain mix-blend-multiply" />
+        <img src="/hero/space-to-learn.png" alt="" className="w-full h-full object-contain" />
       </div>
 
       {/* Tagline */}
