@@ -1,93 +1,24 @@
-import { PenLine, Video, BookOpen, Rocket, Lightbulb } from 'lucide-react'
+import { Mic, Video, MessageCircle, Palette, Lightbulb, Trophy } from 'lucide-react'
 
-// Seed student-generated content. New submissions created in-app are appended
-// via AppContext and start life with status: 'pending'.
+// The 6 Create Hub tiles. Each maps to a contributions.content_type value —
+// see STUDENT_CONTENT_TYPES in AppContext for the full type vocabulary
+// (opinion/what_i_learned exist in the schema for future finer-grained
+// sub-selection within "Share & Tell", not yet exposed as separate tiles).
 export const CONTENT_TYPES = [
-  { id: 'post', label: 'Post', sub: 'Share your thoughts', icon: PenLine },
-  { id: 'video', label: 'Video', sub: 'Upload a short video', icon: Video },
-  { id: 'story', label: 'Story', sub: 'Tell your story', icon: BookOpen },
-  { id: 'challenge', label: 'Challenge', sub: 'Take on a Zazi challenge', icon: Rocket },
-  { id: 'idea', label: 'Idea', sub: 'Share an idea that could change something', icon: Lightbulb },
+  { id: 'podcast', label: 'Zazi Voices', sub: 'Create a podcast or audio story', icon: Mic, color: '#0D665F' },
+  { id: 'video', label: 'Short Video', sub: 'Create a short video about something you care about', icon: Video, color: '#FF8A00' },
+  { id: 'story', label: 'Share & Tell', sub: 'Tell other young people something you learned, experienced or discovered', icon: MessageCircle, color: '#006E68' },
+  { id: 'creative', label: 'Creative', sub: 'Share art, photography, poetry, music, design or writing', icon: Palette, color: '#F4B84C' },
+  { id: 'idea', label: 'Zazi Ideas', sub: 'Share an idea for improving your school, community or the world', icon: Lightbulb, color: '#E8603C' },
+  { id: 'challenge_submission', label: 'Zazi Challenge', sub: 'Respond to an official Zazi challenge', icon: Trophy, color: '#5F9770' },
 ]
 
-export const EXPLORE_CATEGORIES = [
+export const EXPLORE_FILTERS = [
   { id: 'all', label: 'All' },
-  { id: 'stories', label: 'Student Stories' },
-  { id: 'career', label: 'Career' },
-  { id: 'finance', label: 'Money' },
-  { id: 'digital', label: 'Digital' },
-  { id: 'entrepreneurship', label: 'Business' },
-  { id: 'leadership', label: 'Leadership' },
-  { id: 'civic', label: 'Community' },
-]
-
-export const STUDENT_CONTENT = [
-  {
-    id: 'c-1',
-    title: 'How I Built My First Budget',
-    type: 'post',
-    pillar: 'finance',
-    category: 'finance',
-    description: 'I used the R500 budget lesson to plan my first month of saving for a new phone. Here\'s what I learned.',
-    author: 'Naledi K.',
-    avatarId: 'lerato',
-    school: 'Soweto High School',
-    color: '#F4B84C',
-    status: 'approved',
-    views: 842,
-    likes: 96,
-    comments: 14,
-    createdAt: '2026-07-28',
-  },
-  {
-    id: 'c-2',
-    title: 'My Dream Career: Aerospace Engineer',
-    type: 'video',
-    pillar: 'career',
-    category: 'career',
-    description: 'A 60-second video on why I want to design aircraft one day, and the subjects I\'m taking to get there.',
-    author: 'Dumisani K.',
-    avatarId: 'dumisani',
-    school: 'Umlazi Comprehensive School',
-    color: '#FF8A00',
-    status: 'approved',
-    views: 1310,
-    likes: 203,
-    comments: 31,
-    createdAt: '2026-07-30',
-  },
-  {
-    id: 'c-3',
-    title: 'Why I Started a Recycling Club',
-    type: 'story',
-    pillar: 'civic',
-    category: 'civic',
-    description: 'After the Active Citizenship lesson, three of us started a recycling club at school. Here\'s how it went.',
-    author: 'Amara T.',
-    avatarId: 'amahle',
-    school: 'Khayelitsha Secondary School',
-    color: '#5F9770',
-    status: 'approved',
-    views: 674,
-    likes: 88,
-    comments: 9,
-    createdAt: '2026-08-01',
-  },
-  {
-    id: 'c-4',
-    title: 'App Idea: A Load-Shedding Study Buddy',
-    type: 'idea',
-    pillar: 'entrepreneurship',
-    category: 'entrepreneurship',
-    description: 'My idea for an app that helps students plan study time around load-shedding schedules.',
-    author: 'Thando P.',
-    avatarId: 'kagiso',
-    school: 'Mbombela High School',
-    color: '#E8603C',
-    status: 'pending',
-    views: 0,
-    likes: 0,
-    comments: 0,
-    createdAt: '2026-08-06',
-  },
+  { id: 'podcast', label: 'Voices' },
+  { id: 'video', label: 'Videos' },
+  { id: 'story', label: 'Share & Tell' },
+  { id: 'creative', label: 'Creative' },
+  { id: 'idea', label: 'Ideas' },
+  { id: 'challenge_submission', label: 'Challenges' },
 ]

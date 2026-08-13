@@ -1,12 +1,18 @@
+import { useState, useEffect } from 'react'
 import { Users, TrendingUp, Award, School as SchoolIcon, Download } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { supabase } from '../lib/supabase'
 import { PILLARS } from '../data/pillars'
-import { SCHOOLS } from '../data/schools'
 
 const GRADES = [7, 8, 9, 10, 11, 12]
 
 export default function SponsorDashboard() {
   const { publishedLessons } = useApp()
+  const [schools, setSchools] = useState([])
+
+  useEffect(() => {
+    supabase.from('schools').select('*').order('name').then(({ data }) => setSchools(data || []))
+  }, [])
 
   const sponsoredLessons = publishedLessons.filter(l => l.sponsor === 'Standard Bank')
 
@@ -30,7 +36,7 @@ export default function SponsorDashboard() {
   const engagementRate = totalViews ? Math.round((totalCompletions / totalViews) * 100) : 0
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6 rounded-none md:rounded-2xl">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       {/* Header */}
       <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
         <div className="flex items-center gap-4">
@@ -52,7 +58,7 @@ export default function SponsorDashboard() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
           { label: 'Learners Reached',    val: totalLearners.toLocaleString(), icon: Users,     color: '#006E68' },
-          { label: 'Schools Reached',     val: SCHOOLS.length,                 icon: SchoolIcon,color: '#F4B84C' },
+          { label: 'Schools Reached',     val: schools.length,                 icon: SchoolIcon,color: '#F4B84C' },
           { label: 'Lesson Completions',  val: totalCompletions.toLocaleString(), icon: Award,   color: '#FF8A00' },
           { label: 'Engagement Rate',     val: `${engagementRate}%`,           icon: TrendingUp,color: '#0D665F' },
         ].map(k => (
@@ -128,10 +134,10 @@ export default function SponsorDashboard() {
       <div className="bg-white rounded-2xl p-5 shadow-card mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-black text-zazi-navy text-base">School Reach</h3>
-          <span className="text-zazi-muted text-sm">{SCHOOLS.length} schools, all 9 provinces</span>
+          <span className="text-zazi-muted text-sm">{schools.length} schools, all 9 provinces</span>
         </div>
         <div className="grid md:grid-cols-2 gap-2">
-          {SCHOOLS.map(s => (
+          {schools.map(s => (
             <div key={s.id} className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-xl">
               <span className="text-zazi-navy text-sm font-medium">{s.name}</span>
               <span className="text-zazi-muted text-xs">{s.province}</span>
@@ -145,7 +151,7 @@ export default function SponsorDashboard() {
         <p className="text-white/60 text-xs uppercase tracking-widest mb-2">Quarter Summary</p>
         <p className="font-black text-xl mb-1">Building Financial Confidence, One Learner at a Time</p>
         <p className="text-white/70 text-sm mb-4">
-          Your sponsorship of Zazi's Financial Literacy pillar has reached {totalLearners.toLocaleString()} learners across {SCHOOLS.length} schools,
+          Your sponsorship of Zazi's Financial Literacy pillar has reached {totalLearners.toLocaleString()} learners across {schools.length} schools,
           with {totalCompletions.toLocaleString()} lesson completions this quarter.
         </p>
         <button className="bg-zazi-orange text-white font-bold text-sm px-5 py-2.5 rounded-xl">

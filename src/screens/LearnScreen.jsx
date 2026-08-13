@@ -10,7 +10,7 @@ const GRADES = [7, 8, 9, 10, 11, 12]
 export default function LearnScreen() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { user, publishedLessons, progress } = useApp()
+  const { user, publishedLessons, topics, progress } = useApp()
   const [grade, setGrade] = useState(user.grade)
   const [pillar, setPillar] = useState(searchParams.get('pillar') || 'all')
   const [query, setQuery] = useState('')
@@ -28,12 +28,34 @@ export default function LearnScreen() {
     return filtered.filter(l => !progress[l.id]?.completed).slice(0, 3)
   }, [filtered, progress])
 
+  const groupedByTopic = useMemo(() => {
+    const groups = new Map()
+    for (const l of filtered) {
+      const topic = topics.find(t => t.id === l.topicId)
+      const key = topic?.id || 'untopiced'
+      if (!groups.has(key)) groups.set(key, { topic, lessons: [] })
+      groups.get(key).lessons.push(l)
+    }
+    return [...groups.values()].sort((a, b) => {
+      if (a.topic?.pillar !== b.topic?.pillar) return (a.topic?.pillar || '').localeCompare(b.topic?.pillar || '')
+      return (a.topic?.sortOrder ?? 99) - (b.topic?.sortOrder ?? 99)
+    })
+  }, [filtered, topics])
+
   return (
     <div className="min-h-screen bg-zazi-cream flex flex-col pb-[76px] md:pb-10">
-      {/* Header */}
-      <div className="px-6 pt-7 pb-2">
-        <h1 className="text-2xl font-extrabold text-zazi-navy leading-tight">What do you want to learn today?</h1>
-        <div className="bg-white rounded-2xl flex items-center gap-2.5 px-4 py-3.5 shadow-soft mt-4">
+      {/* Hero — hook question this screen answers */}
+      <div className="relative w-full overflow-hidden" style={{ height: 220 }}>
+        <img src="/hero/learn-hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-zazi-cream via-zazi-cream/15 to-transparent" />
+        <h1 className="absolute bottom-5 left-6 right-6 text-white text-2xl font-extrabold leading-tight drop-shadow-sm z-10">
+          What do you want to learn today?
+        </h1>
+      </div>
+
+      <div className="px-6 pt-4 pb-2">
+        <div className="bg-white rounded-2xl flex items-center gap-2.5 px-4 py-3.5 shadow-soft">
           <Search size={17} className="text-zazi-navy/40" />
           <input
             value={query}
@@ -99,7 +121,7 @@ export default function LearnScreen() {
         </section>
       )}
 
-      {/* Lesson list */}
+      {/* Lesson list, grouped by topic */}
       <section className="mt-6 px-6 pb-2">
         <h3 className="font-extrabold text-zazi-navy text-sm mb-3">
           {pillar === 'all' ? `Grade ${grade} Lessons` : PILLARS.find(p => p.id === pillar)?.name}
@@ -110,9 +132,23 @@ export default function LearnScreen() {
             <p className="text-zazi-navy/50 text-xs mt-1">Try another grade or pillar — more lessons are on the way.</p>
           </Card>
         ) : (
-          <div className="space-y-3">
-            {filtered.map(l => (
-              <LessonRow key={l.id} lesson={l} progress={progress[l.id]} onClick={() => navigate(`/learn/${l.id}`)} />
+          <div className="space-y-6">
+            {groupedByTopic.map(group => (
+              <div key={group.topic?.id || 'untopiced'}>
+                {group.topic && (
+                  <div className="mb-2.5">
+                    <p className="text-zazi-navy/80 font-bold text-xs uppercase tracking-wide">{group.topic.name}</p>
+                    {group.topic.description && (
+                      <p className="text-zazi-navy/45 text-[11px] mt-0.5">{group.topic.description}</p>
+                    )}
+                  </div>
+                )}
+                <div className="space-y-3">
+                  {group.lessons.map(l => (
+                    <LessonRow key={l.id} lesson={l} progress={progress[l.id]} onClick={() => navigate(`/learn/${l.id}`)} />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}
@@ -127,26 +163,37 @@ function LessonMiniCard({ lesson, onClick }) {
     <button onClick={onClick} className="zazi-tap flex-shrink-0 w-40 text-left">
       <div
         className="w-full rounded-2xl relative overflow-hidden flex items-center justify-center"
-        style={{ height: 96, background: lesson.color }}
+        style={{ height: 112, background: lesson.color }}
       >
-        <pillar.icon size={26} className="text-white/85" />
+        {lesson.coverImageUrl ? (
+          <img src={lesson.coverImageUrl} alt="" className="w-full h-full object-cover" />
+        ) : (
+          <pillar.icon size={26} className="text-white/85" />
+        )}
+        <div className="absolute top-2 left-2">
+          <Chip color={pillar.color} tone="solid">{pillar.short}</Chip>
+        </div>
+        <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/75 to-transparent" />
+        <p className="absolute bottom-1.5 left-2 right-2 text-white font-bold text-xs leading-tight line-clamp-2 drop-shadow-sm">{lesson.title}</p>
       </div>
-      <Chip color={pillar.color} className="mt-2">{pillar.short}</Chip>
-      <p className="text-zazi-navy font-bold text-xs leading-tight mt-1.5">{lesson.title}</p>
     </button>
   )
 }
 
 function LessonRow({ lesson, progress, onClick }) {
   const pillar = PILLARS.find(p => p.id === lesson.pillar)
-  const pct = progress?.completed ? 100 : progress?.started ? 40 : 0
+  const pct = progress?.completed ? 100 : progress?.started ? 50 : 0
   return (
     <Card as="button" onClick={onClick} className="w-full p-3 flex gap-3 items-center text-left">
       <div
         className="w-16 h-16 rounded-xl flex-shrink-0 flex items-center justify-center relative overflow-hidden"
         style={{ background: lesson.color }}
       >
-        <pillar.icon size={22} className="text-white/85" />
+        {lesson.coverImageUrl ? (
+          <img src={lesson.coverImageUrl} alt="" className="w-full h-full object-cover" />
+        ) : (
+          <pillar.icon size={22} className="text-white/85" />
+        )}
         {progress?.completed && (
           <div className="absolute inset-0 bg-black/30 flex items-center justify-center"><Check size={18} strokeWidth={3} className="text-white" /></div>
         )}

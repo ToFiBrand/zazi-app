@@ -2,17 +2,43 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronDown, CheckCircle2 } from 'lucide-react'
 import { PILLARS } from '../data/pillars'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
 
 export default function ContributorApplicationScreen() {
   const navigate = useNavigate()
+  const { profile, refreshProfile } = useAuth()
   const [name, setName] = useState('')
   const [role, setRole] = useState('')
   const [org, setOrg] = useState('')
   const [pillar, setPillar] = useState(PILLARS[0].id)
   const [experience, setExperience] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
-  const canSubmit = name.trim() && role.trim() && experience.trim()
+  const canSubmit = name.trim() && role.trim() && experience.trim() && !submitting
+
+  const handleSubmit = async () => {
+    if (!canSubmit || !profile) return
+    setSubmitting(true)
+    setError('')
+    const { error: insertError } = await supabase.from('teacher_applications').insert({
+      applicant_id: profile.id,
+      full_name: name.trim(),
+      professional_role: role.trim(),
+      organisation: org.trim(),
+      pillar,
+      qualifications: experience.trim(),
+    })
+    setSubmitting(false)
+    if (insertError) {
+      setError(insertError.message)
+      return
+    }
+    await refreshProfile()
+    setSubmitted(true)
+  }
 
   if (submitted) {
     return (
@@ -82,14 +108,16 @@ export default function ContributorApplicationScreen() {
           </p>
         </div>
 
+        {error && <p className="text-zazi-coral text-xs font-semibold text-center">{error}</p>}
+
         <button
-          onClick={() => canSubmit && setSubmitted(true)}
+          onClick={handleSubmit}
           disabled={!canSubmit}
           className={`w-full font-black py-4 rounded-2xl text-base transition-all ${
             canSubmit ? 'bg-zazi-orange text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           }`}
         >
-          Submit Application
+          {submitting ? 'Submitting...' : 'Submit Application'}
         </button>
       </div>
     </div>

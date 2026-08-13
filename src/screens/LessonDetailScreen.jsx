@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, Play, Clock, Download, CheckCircle2, MessageCircle, Zap, SearchX } from 'lucide-react'
+import { ChevronLeft, Play, Clock, Download, CheckCircle2, MessageCircle, Zap, SearchX, Sparkles, HelpCircle, Check, X } from 'lucide-react'
 import { PILLARS } from '../data/pillars'
 import { useApp } from '../context/AppContext'
 import { Avatar, Card, Chip, Button } from '../components/ui'
@@ -13,10 +13,15 @@ const DISCUSSION_REPLIES = [
 export default function LessonDetailScreen() {
   const navigate = useNavigate()
   const { lessonId } = useParams()
-  const { lessons, progress, startLesson, completeLesson, user } = useApp()
+  const { lessons, topics, quizQuestions, progress, startLesson, completeLesson, user } = useApp()
   const lesson = lessons.find(l => l.id === lessonId)
+  const topic = topics.find(t => t.id === lesson?.topicId)
+  const lessonQuiz = useMemo(() => quizQuestions.filter(q => q.lessonId === lessonId).sort((a, b) => a.sortOrder - b.sortOrder), [quizQuestions, lessonId])
   const [justCompleted, setJustCompleted] = useState(false)
   const [comment, setComment] = useState('')
+  const [resourceOpen, setResourceOpen] = useState(false)
+  const [quizAnswers, setQuizAnswers] = useState({})
+  const [quizSubmitted, setQuizSubmitted] = useState(false)
 
   useEffect(() => { if (lesson) startLesson(lesson.id) }, [lesson, startLesson])
 
@@ -48,33 +53,50 @@ export default function LessonDetailScreen() {
 
   const pillar = PILLARS.find(p => p.id === lesson.pillar)
   const done = !!progress[lesson.id]?.completed
+  const bodyParagraphs = (lesson.contentBody || lesson.description || '').split('\n\n').filter(Boolean)
+  const quizScore = lessonQuiz.filter(q => quizAnswers[q.id] === q.correctIndex).length
 
   return (
     <div className="min-h-screen bg-zazi-cream flex flex-col">
-      {/* Video hero */}
+      {/* Hero */}
       <div
-        className="relative w-full flex items-center justify-center flex-shrink-0"
+        className="relative w-full flex items-center justify-center flex-shrink-0 overflow-hidden"
         style={{ height: 220, background: `linear-gradient(135deg, ${lesson.color}, ${pillar?.color || lesson.color})` }}
       >
-        <button onClick={() => navigate('/learn')} className="absolute top-4 left-4 w-9 h-9 bg-black/25 backdrop-blur rounded-full flex items-center justify-center">
+        {lesson.coverImageUrl && (
+          <img src={lesson.coverImageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        )}
+        <button onClick={() => navigate('/learn')} className="absolute top-4 left-4 w-9 h-9 bg-black/25 backdrop-blur rounded-full flex items-center justify-center z-10">
           <ChevronLeft size={18} className="text-white" />
         </button>
-        <pillar.icon size={72} className="text-white/15 absolute" />
-        <button className="zazi-tap w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl relative">
+        {!lesson.coverImageUrl && <pillar.icon size={72} className="text-white/15 absolute" />}
+        <div className="absolute top-4 right-4 flex flex-col items-end gap-1.5 z-10">
+          <Chip color={pillar.color} tone="solid" icon={<pillar.icon size={11} />}>{pillar.short}</Chip>
+          <div className="bg-black/40 backdrop-blur rounded-full px-2.5 py-1 flex items-center gap-1">
+            <Clock size={11} className="text-white" />
+            <span className="text-white text-[11px] font-medium">{lesson.duration} min</span>
+          </div>
+        </div>
+        <button className="zazi-tap w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl relative z-10">
           <Play size={26} className="text-zazi-orange fill-zazi-orange ml-1" />
         </button>
-        <div className="absolute bottom-3 right-3 bg-black/40 backdrop-blur rounded-full px-2.5 py-1 flex items-center gap-1">
-          <Clock size={11} className="text-white" />
-          <span className="text-white text-[11px] font-medium">{lesson.duration} min</span>
-        </div>
+        {/* Scrim keeps the title legible over any cover image */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        <h1 className="absolute bottom-4 left-4 right-4 text-white font-extrabold text-xl leading-snug drop-shadow-sm z-10">
+          {lesson.title}
+        </h1>
       </div>
 
       <div className="px-6 pt-5 flex-1">
+        {topic && (
+          <p className="text-zazi-navy/40 text-[11px] font-semibold mb-1.5">{pillar.name} · {topic.name}</p>
+        )}
         <div className="flex gap-2 mb-2.5">
-          <Chip color={pillar.color} icon={<pillar.icon size={11} />}>{pillar.short}</Chip>
           <Chip color="#17283A">Grade {lesson.gradeMin}-{lesson.gradeMax}</Chip>
         </div>
-        <h1 className="text-xl font-extrabold text-zazi-navy leading-snug">{lesson.title}</h1>
+        {lesson.hook && (
+          <p className="text-zazi-navy/55 text-sm italic leading-relaxed mt-2">{lesson.hook}</p>
+        )}
 
         {/* Contributor */}
         <div className="flex items-center gap-2.5 mt-4">
@@ -88,10 +110,14 @@ export default function LessonDetailScreen() {
           )}
         </div>
 
-        {/* About */}
+        {/* About / teaching content */}
         <div className="mt-5">
           <h3 className="font-extrabold text-zazi-navy text-sm mb-2">About This Lesson</h3>
-          <p className="text-zazi-navy/65 text-sm leading-relaxed">{lesson.description}</p>
+          <div className="space-y-3">
+            {bodyParagraphs.map((p, i) => (
+              <p key={i} className="text-zazi-navy/65 text-sm leading-relaxed">{p}</p>
+            ))}
+          </div>
         </div>
 
         {/* What you'll learn */}
@@ -107,16 +133,41 @@ export default function LessonDetailScreen() {
           </ul>
         </div>
 
+        {/* Key Takeaways */}
+        {lesson.keyTakeaways?.length > 0 && (
+          <div className="mt-5 rounded-2xl p-4 bg-zazi-navy">
+            <p className="text-zazi-gold font-bold text-xs flex items-center gap-1.5 mb-2.5">
+              <Sparkles size={13} /> KEY TAKEAWAYS
+            </p>
+            <ul className="space-y-2">
+              {lesson.keyTakeaways.map((t, i) => (
+                <li key={i} className="text-white/80 text-sm leading-relaxed flex gap-2">
+                  <span className="text-zazi-gold flex-shrink-0">•</span>{t}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Resource */}
-        <Card className="mt-5 p-3.5 flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-zazi-teal/10 flex items-center justify-center flex-shrink-0">
-            <Download size={18} className="text-zazi-teal" />
+        <Card className="mt-5 p-3.5">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-zazi-teal/10 flex items-center justify-center flex-shrink-0">
+              <Download size={18} className="text-zazi-teal" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-zazi-navy font-bold text-sm truncate">{lesson.resource.name}</p>
+              <p className="text-zazi-navy/40 text-[11px]">{lesson.resource.type} · Lesson resource</p>
+            </div>
+            <button onClick={() => setResourceOpen(v => !v)} className="text-zazi-teal text-xs font-bold flex-shrink-0">
+              {resourceOpen ? 'Hide' : 'View'}
+            </button>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-zazi-navy font-bold text-sm truncate">{lesson.resource.name}</p>
-            <p className="text-zazi-navy/40 text-[11px]">{lesson.resource.type} · Lesson resource</p>
-          </div>
-          <button className="text-zazi-teal text-xs font-bold flex-shrink-0">View</button>
+          {resourceOpen && lesson.resource.content && (
+            <div className="mt-3.5 pt-3.5 border-t border-gray-100">
+              <p className="text-zazi-navy/70 text-xs leading-relaxed whitespace-pre-line">{lesson.resource.content}</p>
+            </div>
+          )}
         </Card>
 
         {/* Take Action */}
@@ -159,8 +210,63 @@ export default function LessonDetailScreen() {
           <p className="text-zazi-navy/35 text-[11px] mt-2">Comments are moderated to keep this space safe.</p>
         </div>
 
+        {/* Checkpoint quiz */}
+        {lessonQuiz.length > 0 && (
+          <div className="mt-6">
+            <h3 className="font-extrabold text-zazi-navy text-sm mb-1 flex items-center gap-1.5">
+              <HelpCircle size={15} /> Quick Checkpoint
+            </h3>
+            <p className="text-zazi-navy/50 text-xs mb-3">See how much stuck — no pressure, just a quick check.</p>
+            <div className="space-y-4">
+              {lessonQuiz.map((q, qi) => (
+                <Card key={q.id} className="p-4">
+                  <p className="text-zazi-navy font-bold text-sm mb-3">{qi + 1}. {q.question}</p>
+                  <div className="space-y-2">
+                    {q.options.map((opt, oi) => {
+                      const selected = quizAnswers[q.id] === oi
+                      const isCorrect = oi === q.correctIndex
+                      let style = 'border-gray-200 bg-white text-zazi-navy/80'
+                      if (quizSubmitted) {
+                        if (isCorrect) style = 'border-zazi-teal bg-zazi-teal/10 text-zazi-teal'
+                        else if (selected) style = 'border-zazi-coral bg-zazi-coral/10 text-zazi-coral'
+                      } else if (selected) {
+                        style = 'border-zazi-orange bg-zazi-orange/10 text-zazi-navy'
+                      }
+                      return (
+                        <button
+                          key={oi}
+                          disabled={quizSubmitted}
+                          onClick={() => setQuizAnswers(prev => ({ ...prev, [q.id]: oi }))}
+                          className={`w-full text-left text-sm px-3.5 py-2.5 rounded-xl border-2 transition-colors flex items-center justify-between ${style}`}
+                        >
+                          {opt}
+                          {quizSubmitted && isCorrect && <Check size={15} className="flex-shrink-0" />}
+                          {quizSubmitted && selected && !isCorrect && <X size={15} className="flex-shrink-0" />}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </Card>
+              ))}
+            </div>
+            {!quizSubmitted ? (
+              <Button
+                variant="teal"
+                size="sm"
+                className="mt-3"
+                disabled={Object.keys(quizAnswers).length < lessonQuiz.length}
+                onClick={() => setQuizSubmitted(true)}
+              >
+                Check Answers
+              </Button>
+            ) : (
+              <p className="text-zazi-navy font-bold text-sm mt-3">You got {quizScore} of {lessonQuiz.length} right 🎉</p>
+            )}
+          </div>
+        )}
+
         {/* Completion */}
-        <div className="mt-7 mb-5">
+        <div className="mt-7 mb-2">
           {done || justCompleted ? (
             <div className="rounded-3xl p-5 text-center" style={{ background: '#00807614' }}>
               <p className="text-zazi-teal font-extrabold text-base">Nice work! 🎉</p>
@@ -181,6 +287,9 @@ export default function LessonDetailScreen() {
             </Button>
           )}
         </div>
+        {lesson.completionCriteria && !done && !justCompleted && (
+          <p className="text-zazi-navy/35 text-[11px] text-center mb-5">{lesson.completionCriteria}</p>
+        )}
       </div>
     </div>
   )

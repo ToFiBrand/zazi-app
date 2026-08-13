@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { X, ChevronDown, ImagePlus, CheckCircle2, Check } from 'lucide-react'
+import { X, ChevronDown, ImagePlus, CheckCircle2 } from 'lucide-react'
 import { CONTENT_TYPES } from '../data/content'
 import { PILLARS } from '../data/pillars'
 import { useApp } from '../context/AppContext'
@@ -9,30 +9,30 @@ import { Button } from '../components/ui'
 export default function CreateSubmissionScreen() {
   const navigate = useNavigate()
   const { type } = useParams()
-  const { user, school, submitContent } = useApp()
+  const { user, school, submitContribution } = useApp()
   const typeInfo = CONTENT_TYPES.find(t => t.id === type) || CONTENT_TYPES[0]
 
   const [title, setTitle] = useState('')
   const [pillar, setPillar] = useState(PILLARS[0].id)
   const [description, setDescription] = useState('')
-  const [isChallengeResponse, setIsChallengeResponse] = useState(typeInfo.id === 'challenge')
+  const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
-  const canSubmit = title.trim().length > 2 && description.trim().length > 5
+  const canSubmit = title.trim().length > 2 && description.trim().length > 5 && !submitting
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return
-    const pillarInfo = PILLARS.find(p => p.id === pillar)
-    submitContent({
+    setSubmitting(true)
+    const result = await submitContribution({
       title: title.trim(),
       type: typeInfo.id,
       pillar,
-      category: pillar,
       description: description.trim(),
-      color: pillarInfo?.color || '#FF8A00',
-      school: school?.name,
+      gradeMin: user.grade,
+      gradeMax: user.grade,
     })
-    setSubmitted(true)
+    setSubmitting(false)
+    if (result) setSubmitted(true)
   }
 
   if (submitted) {
@@ -41,9 +41,9 @@ export default function CreateSubmissionScreen() {
         <div className="w-16 h-16 bg-zazi-teal/12 rounded-full flex items-center justify-center mb-4">
           <CheckCircle2 size={32} className="text-zazi-teal" />
         </div>
-        <h2 className="text-xl font-extrabold text-zazi-navy">Your story has been submitted.</h2>
+        <h2 className="text-xl font-extrabold text-zazi-navy">Your creation has been submitted to Zazi.</h2>
         <p className="text-zazi-navy/60 text-sm mt-2 leading-relaxed">
-          Your creation is now being reviewed by the Zazi team. We'll let you know as soon as it's live.
+          Once reviewed, it may appear in the Zazi community.
         </p>
         <Button variant="primary" className="mt-6" onClick={() => navigate('/home')}>
           Back to Home
@@ -77,7 +77,7 @@ export default function CreateSubmissionScreen() {
         {/* Media placeholder */}
         <div>
           <label className="block text-zazi-navy font-bold text-sm mb-2">
-            {typeInfo.id === 'video' ? 'Video' : typeInfo.id === 'post' ? 'Image (optional)' : 'Cover Image (optional)'}
+            {typeInfo.id === 'video' ? 'Video' : typeInfo.id === 'podcast' ? 'Audio (optional)' : 'Cover Image (optional)'}
           </label>
           <div className="border-2 border-dashed border-zazi-orange/40 rounded-2xl p-6 flex flex-col items-center gap-2 bg-zazi-orange/5">
             <div className="w-12 h-12 bg-zazi-orange/15 rounded-full flex items-center justify-center">
@@ -131,19 +131,6 @@ export default function CreateSubmissionScreen() {
           </div>
         </div>
 
-        {/* Challenge toggle */}
-        <label className="flex items-center justify-between bg-white rounded-2xl px-4 py-3.5 shadow-soft cursor-pointer">
-          <span className="text-zazi-navy font-semibold text-sm pr-3">This is a response to a Zazi Challenge</span>
-          <button
-            type="button"
-            onClick={() => setIsChallengeResponse(v => !v)}
-            className="w-6 h-6 rounded-md flex items-center justify-center transition-colors flex-shrink-0"
-            style={{ background: isChallengeResponse ? '#FF8A00' : '#EFE4C9' }}
-          >
-            {isChallengeResponse && <Check size={14} strokeWidth={3} className="text-white" />}
-          </button>
-        </label>
-
         {/* School (read-only) */}
         <div className="bg-zazi-input-bg rounded-2xl px-4 py-3.5 flex items-center justify-between">
           <span className="text-zazi-navy/50 text-sm">School</span>
@@ -158,7 +145,7 @@ export default function CreateSubmissionScreen() {
         </div>
 
         <Button variant="primary" size="lg" full onClick={handleSubmit} disabled={!canSubmit}>
-          Submit for Review
+          {submitting ? 'Submitting...' : 'Submit for Review'}
         </Button>
       </div>
     </div>

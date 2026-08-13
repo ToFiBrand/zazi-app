@@ -2,6 +2,15 @@ import { Briefcase, PiggyBank, Laptop2, Rocket, Megaphone, HandHeart } from 'luc
 
 export const PILLARS = [
   {
+    id: 'entrepreneurship',
+    name: 'Entrepreneurship & Innovation',
+    short: 'Business',
+    description: 'Solve problems, build ideas and pitch like a founder.',
+    icon: Rocket,
+    color: '#E8603C',
+    art: '/pillars/entrepreneurship.svg',
+  },
+  {
     id: 'career',
     name: 'Career & Future Readiness',
     short: 'Career',
@@ -27,15 +36,6 @@ export const PILLARS = [
     icon: Laptop2,
     color: '#006E68',
     art: '/pillars/digital.svg',
-  },
-  {
-    id: 'entrepreneurship',
-    name: 'Entrepreneurship & Innovation',
-    short: 'Business',
-    description: 'Solve problems, build ideas and pitch like a founder.',
-    icon: Rocket,
-    color: '#E8603C',
-    art: '/pillars/entrepreneurship.svg',
   },
   {
     id: 'leadership',

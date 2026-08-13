@@ -1,37 +1,36 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Headphones, BookOpen, Brain, Palette, Briefcase, Globe2 } from 'lucide-react'
+import { Rocket, Cpu, PiggyBank, Briefcase, Megaphone, Palette } from 'lucide-react'
 import Button from '../components/ui/Button'
 
 const FEATURES = [
-  { icon: Headphones, text: 'News, podcasts & videos made for YOU' },
-  { icon: BookOpen, text: 'School subjects explained in real talk' },
-  { icon: Brain, text: 'Challenges that level up your mind' },
-  { icon: Palette, text: 'Spaces to create, post and shine' },
-  { icon: Briefcase, text: 'Career tools to plan your future' },
-  { icon: Globe2, text: 'Real African stories, news and voices' },
+  { icon: Rocket, text: 'Entrepreneurship & innovation' },
+  { icon: Cpu, text: 'STEM, AI & digital skills' },
+  { icon: PiggyBank, text: 'Real-life money smarts' },
+  { icon: Briefcase, text: 'Careers & real pathways' },
+  { icon: Megaphone, text: 'Leadership & communication' },
+  { icon: Palette, text: 'Creativity & culture' },
 ]
 
 const SLIDES = [
   {
-    art: '/hero/welcome.png',
+    video: '/video/welcome.mp4',
+    poster: '/hero/welcome.jpg',
     title: 'Welcome to Zazi',
-    intro: 'The city of your future, where',
-    focusWords: ['Current Affairs', 'News', 'Knowledge', 'Culture', 'Creativity'],
-    outro: 'collide.',
-    sub: "Step in, speak up and shape the world that's waiting for you.",
+    body: "This is the city where you build the skills school doesn't always teach — entrepreneurship, tech, money, leadership and more.",
   },
   {
-    art: '/hero/what-youll-find.png',
+    video: '/video/what-youll-find.mp4',
+    poster: '/hero/what-youll-find.jpg',
     title: "What You'll Find Here",
     features: true,
-    sub: "Let's explore what matters.",
   },
   {
-    art: '/hero/you-belong.png',
+    video: '/video/you-belong.mp4',
+    poster: '/hero/you-belong.jpg',
     title: 'You Belong Here',
     subtitle: 'Zazi means "to know yourself"',
-    body: "This is a platform made by youth, for youth. Here, your voice matters. Your ideas matter. Your story matters.",
+    body: 'A platform made by youth, for youth. Your voice matters. Your ideas matter. Your story matters.',
     cta: 'Start your journey',
   },
 ]
@@ -43,80 +42,70 @@ export default function OnboardingScreen() {
   const isLast = slide === SLIDES.length - 1
 
   return (
-    <div className="min-h-screen md:min-h-0 md:flex-1 flex flex-col bg-zazi-cream">
-      {/* Top */}
-      <div className="flex justify-between items-center px-6 pt-6">
-        <img src="/logo-h.svg" alt="Zazi" className="h-10 object-contain" />
-        <button onClick={() => navigate('/login')} className="text-zazi-navy/50 text-sm font-semibold">Skip</button>
+    <div className="min-h-screen w-full flex flex-col bg-zazi-navy">
+      {/* Image — most of the screen */}
+      <div className="relative w-full flex-1 min-h-0 overflow-hidden" key={slide}>
+        <video
+          src={s.video}
+          poster={s.poster}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover zazi-fade-up"
+        />
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/30 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-zazi-navy to-transparent" />
+
+        <div className="absolute top-6 left-0 right-0 flex justify-center z-10">
+          <img src="/logo-v.svg" alt="Zazi" className="h-14 object-contain drop-shadow-md" />
+        </div>
+        <button onClick={() => navigate('/welcome')} className="absolute top-6 right-6 text-white text-sm font-semibold bg-black/25 backdrop-blur px-3.5 py-1.5 rounded-full z-10">
+          Skip
+        </button>
       </div>
 
-      {/* Hero art */}
-      <div className="px-4 mt-2 flex-shrink-0" key={slide}>
-        <img src={s.art} alt="" className="w-full h-72 object-contain zazi-fade-up" />
-      </div>
+      {/* Text, just above the button — image gets the space */}
+      <div className="flex-shrink-0 px-7 pt-3 pb-8 bg-zazi-navy" key={`content-${slide}`}>
+        <div className="text-center mb-4">
+          {s.subtitle && (
+            <p className="text-zazi-gold font-bold text-sm mb-1 zazi-fade-up">{s.subtitle}</p>
+          )}
+          <h1 className="text-white font-extrabold text-xl leading-tight mb-1.5 zazi-fade-up">
+            {s.title}
+          </h1>
 
-      {/* Content */}
-      <div className="flex-1 px-7 pt-4 pb-2 flex flex-col min-h-0" key={`content-${slide}`}>
-        {s.subtitle && (
-          <p className="text-zazi-teal font-bold text-base mb-1 zazi-fade-up">{s.subtitle}</p>
-        )}
-        <h1 className="text-3xl font-extrabold text-zazi-navy mb-3 leading-tight zazi-fade-up">{s.title}</h1>
-
-        {s.focusWords ? (
-          <div className="mb-2">
-            <p className="text-zazi-navy/70 text-base leading-relaxed zazi-fade-up">{s.intro}</p>
-            <div className="my-1">
-              {s.focusWords.map((w, i) => (
-                <div key={w}>
-                  <p
-                    className="text-zazi-orange font-extrabold text-2xl leading-[1.15] zazi-fade-up"
-                    style={{ animationDelay: `${i * 60}ms` }}
-                  >
-                    {w}
-                  </p>
-                  {i < s.focusWords.length - 1 && (
-                    <p className="text-zazi-orange/25 font-bold text-sm leading-none my-0.5">|</p>
-                  )}
+          {s.features ? (
+            <div className="grid grid-cols-2 gap-x-3 gap-y-2 mt-3 text-left max-w-sm mx-auto">
+              {FEATURES.map((f, i) => (
+                <div key={i} className="flex items-center gap-2 text-white text-[11px] font-medium leading-tight zazi-fade-up" style={{ animationDelay: `${i * 40}ms` }}>
+                  <span className="w-6 h-6 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0">
+                    <f.icon size={12} className="text-white" />
+                  </span>
+                  {f.text}
                 </div>
               ))}
             </div>
-            <p className="text-zazi-navy/70 text-base leading-relaxed zazi-fade-up">{s.outro}</p>
-          </div>
-        ) : s.features ? (
-          <ul className="space-y-3 mb-4">
-            {FEATURES.map((f, i) => (
-              <li key={i} className="flex items-center gap-3 text-zazi-navy text-sm font-medium zazi-fade-up" style={{ animationDelay: `${i * 40}ms` }}>
-                <span className="w-9 h-9 rounded-full bg-zazi-teal/10 flex items-center justify-center flex-shrink-0">
-                  <f.icon size={17} className="text-zazi-teal" />
-                </span>
-                {f.text}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-zazi-navy/70 text-base leading-relaxed mb-3 zazi-fade-up">{s.body}</p>
-        )}
+          ) : (
+            <p className="text-white/85 text-sm leading-relaxed max-w-sm mx-auto zazi-fade-up">{s.body}</p>
+          )}
+        </div>
 
-        {s.sub && <p className="text-zazi-navy/60 text-sm mt-auto zazi-fade-up">{s.sub}</p>}
-      </div>
-
-      {/* Dots + CTA */}
-      <div className="px-7 pb-9 pt-3 flex flex-col items-center gap-5">
-        <div className="flex gap-2">
+        <div className="flex justify-center gap-2 mb-4">
           {SLIDES.map((_, i) => (
             <div
               key={i}
               className="h-2 rounded-full transition-all duration-300"
               style={{
                 width: i === slide ? 26 : 8,
-                background: i === slide ? '#FF8A00' : '#EFE4C9',
+                background: i === slide ? '#FF8A00' : 'rgba(255,255,255,0.25)',
               }}
             />
           ))}
         </div>
 
         {isLast ? (
-          <Button variant="primary" size="lg" full onClick={() => navigate('/login')}>
+          <Button variant="primary" size="lg" full onClick={() => navigate('/welcome')}>
             {s.cta}
           </Button>
         ) : (

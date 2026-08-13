@@ -11,10 +11,10 @@ export default function AppShell() {
   const showBottomNav = TAB_ROOTS.includes(pathname)
 
   return (
-    <div className="min-h-screen bg-zazi-cream md:bg-zazi-navy">
+    <div className="min-h-screen bg-zazi-cream">
       <Sidebar />
       <div className="md:pl-60 flex md:justify-center">
-        <div className="w-full bg-zazi-cream min-h-screen md:border-x md:border-white/5" style={{ maxWidth: 640 }}>
+        <div className="w-full min-h-screen" style={{ maxWidth: 640 }}>
           <Outlet />
         </div>
       </div>

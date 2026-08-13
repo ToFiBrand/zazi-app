@@ -1,12 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronDown, ChevronLeft, Check } from 'lucide-react'
-import { SCHOOLS } from '../data/schools'
-import { useApp } from '../context/AppContext'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
 import Button from '../components/ui/Button'
 
 const GRADES = [7, 8, 9, 10, 11, 12]
-const LANGS = ['English','Zulu','Xhosa','Afrikaans','Sotho','Tswana']
 
 function Field({ label, children }) {
   return (
@@ -19,33 +18,50 @@ function Field({ label, children }) {
 
 export default function SignUpScreen() {
   const navigate = useNavigate()
-  const { updateProfile } = useApp()
+  const { signUp } = useAuth()
+  const [schools, setSchools] = useState([])
   const [agreed, setAgreed] = useState(false)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [grade, setGrade] = useState('')
   const [schoolId, setSchoolId] = useState('')
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  const canSubmit = firstName.trim() && lastName.trim() && grade && schoolId && agreed
+  useEffect(() => {
+    supabase.from('schools').select('id, name, province').order('name')
+      .then(({ data }) => setSchools(data || []))
+  }, [])
 
-  const handleSubmit = () => {
+  const canSubmit = firstName.trim() && lastName.trim() && email.trim() && password.length >= 6 && grade && schoolId && agreed
+
+  const handleSubmit = async () => {
     if (!canSubmit) return
-    const school = SCHOOLS.find(s => s.id === schoolId)
-    updateProfile({
+    setSubmitting(true)
+    setError('')
+    const { error: signUpError } = await signUp({
+      email: email.trim(),
+      password,
       firstName: firstName.trim(),
       lastName: lastName.trim(),
-      grade: Number(grade),
+      grade,
       schoolId,
-      province: school?.province,
     })
+    setSubmitting(false)
+    if (signUpError) {
+      setError(signUpError.message)
+      return
+    }
     navigate('/interests')
   }
 
   return (
-    <div className="min-h-screen md:min-h-0 bg-zazi-cream pb-8">
+    <div className="min-h-screen bg-zazi-cream pb-8">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 pt-5 pb-4">
-        <button onClick={() => navigate('/login')} className="w-8 h-8 flex items-center">
+      <div className="flex items-center gap-3 px-5 pt-5 pb-4 md:max-w-lg md:mx-auto">
+        <button onClick={() => navigate('/welcome')} className="w-8 h-8 flex items-center">
           <ChevronLeft size={20} className="text-zazi-navy" />
         </button>
         <div>
@@ -54,7 +70,7 @@ export default function SignUpScreen() {
         </div>
       </div>
 
-      <div className="px-5 space-y-4">
+      <div className="px-5 space-y-4 md:max-w-lg md:mx-auto">
         <div className="grid grid-cols-2 gap-3">
           <Field label="First Name">
             <input
@@ -76,6 +92,9 @@ export default function SignUpScreen() {
         <Field label="Email Address">
           <input
             type="email"
+            autoComplete="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
             placeholder="your.email@example.com"
             className="w-full bg-zazi-input-bg rounded-xl px-4 py-3.5 text-zazi-navy placeholder-zazi-muted text-sm outline-none focus:ring-2 focus:ring-zazi-orange/40"
           />
@@ -83,7 +102,10 @@ export default function SignUpScreen() {
         <Field label="Password">
           <input
             type="password"
-            placeholder="Create a strong password"
+            autoComplete="new-password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="At least 6 characters"
             className="w-full bg-zazi-input-bg rounded-xl px-4 py-3.5 text-zazi-navy placeholder-zazi-muted text-sm outline-none focus:ring-2 focus:ring-zazi-orange/40"
           />
         </Field>
@@ -94,35 +116,25 @@ export default function SignUpScreen() {
               onChange={e => setSchoolId(e.target.value)}
               className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-zazi-navy text-sm outline-none focus:ring-2 focus:ring-zazi-orange/40"
             >
-              <option value="">Select your school</option>
-              {SCHOOLS.map(s => <option key={s.id} value={s.id}>{s.name} — {s.province}</option>)}
+              <option value="">{schools.length ? 'Select your school' : 'Loading schools...'}</option>
+              {schools.map(s => <option key={s.id} value={s.id}>{s.name} — {s.province}</option>)}
             </select>
             <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-zazi-muted pointer-events-none" />
           </div>
         </Field>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Grade">
-            <div className="relative">
-              <select
-                value={grade}
-                onChange={e => setGrade(e.target.value)}
-                className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-zazi-navy text-sm outline-none focus:ring-2 focus:ring-zazi-orange/40"
-              >
-                <option value="">Grade</option>
-                {GRADES.map(g => <option key={g} value={g}>Grade {g}</option>)}
-              </select>
-              <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-zazi-muted pointer-events-none" />
-            </div>
-          </Field>
-          <Field label="Language">
-            <div className="relative">
-              <select className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-zazi-navy text-sm outline-none focus:ring-2 focus:ring-zazi-orange/40">
-                {LANGS.map(l => <option key={l}>{l}</option>)}
-              </select>
-              <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-zazi-muted pointer-events-none" />
-            </div>
-          </Field>
-        </div>
+        <Field label="Grade">
+          <div className="relative">
+            <select
+              value={grade}
+              onChange={e => setGrade(e.target.value)}
+              className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-zazi-navy text-sm outline-none focus:ring-2 focus:ring-zazi-orange/40"
+            >
+              <option value="">Select your grade</option>
+              {GRADES.map(g => <option key={g} value={g}>Grade {g}</option>)}
+            </select>
+            <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-zazi-muted pointer-events-none" />
+          </div>
+        </Field>
 
         {/* Terms */}
         <label className="flex items-start gap-3 cursor-pointer">
@@ -142,8 +154,10 @@ export default function SignUpScreen() {
           </span>
         </label>
 
-        <Button variant="primary" size="lg" full onClick={handleSubmit} disabled={!canSubmit} className="mt-2">
-          Create Account
+        {error && <p className="text-zazi-coral text-xs font-semibold text-center">{error}</p>}
+
+        <Button variant="primary" size="lg" full onClick={handleSubmit} disabled={!canSubmit || submitting} className="mt-2">
+          {submitting ? 'Creating account...' : 'Create Account'}
         </Button>
 
         <p className="text-center text-sm text-zazi-muted">

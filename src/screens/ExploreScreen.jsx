@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Heart, Eye } from 'lucide-react'
-import { EXPLORE_CATEGORIES, CONTENT_TYPES } from '../data/content'
+import { EXPLORE_FILTERS, CONTENT_TYPES } from '../data/content'
 import { useApp } from '../context/AppContext'
 import { Avatar } from '../components/ui'
 
@@ -9,23 +9,31 @@ const TYPE_ICON = Object.fromEntries(CONTENT_TYPES.map(t => [t.id, t.icon]))
 
 export default function ExploreScreen() {
   const navigate = useNavigate()
-  const { approvedContent } = useApp()
-  const [cat, setCat] = useState('all')
+  const { publishedContributions } = useApp()
+  const [typeFilter, setTypeFilter] = useState('all')
   const [query, setQuery] = useState('')
 
   const filtered = useMemo(() => {
-    return approvedContent.filter(c => {
-      const inCat = cat === 'all' || c.category === cat
+    return publishedContributions.filter(c => {
+      const inType = typeFilter === 'all' || c.type === typeFilter
       const inQuery = !query || c.title.toLowerCase().includes(query.toLowerCase())
-      return inCat && inQuery
+      return inType && inQuery
     })
-  }, [approvedContent, cat, query])
+  }, [publishedContributions, typeFilter, query])
 
   return (
     <div className="min-h-screen bg-zazi-cream flex flex-col pb-[76px] md:pb-10">
-      {/* Header */}
-      <div className="px-6 pt-7 pb-2">
-        <h1 className="text-2xl font-extrabold text-zazi-navy mb-4">Explore</h1>
+      {/* Hero — hook question this screen answers */}
+      <div className="relative w-full overflow-hidden" style={{ height: 220 }}>
+        <img src="/hero/explore-hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-zazi-cream via-zazi-cream/15 to-transparent" />
+        <h1 className="absolute bottom-5 left-6 right-6 text-white text-2xl font-extrabold leading-tight drop-shadow-sm z-10">
+          What's the crew creating?
+        </h1>
+      </div>
+
+      <div className="px-6 pt-4 pb-2">
         <div className="bg-white rounded-2xl flex items-center gap-2.5 px-4 py-3.5 shadow-soft">
           <Search size={17} className="text-zazi-navy/40" />
           <input
@@ -37,14 +45,15 @@ export default function ExploreScreen() {
         </div>
       </div>
 
-      {/* Category chips */}
-      <div className="px-6 flex gap-2 overflow-x-auto no-scrollbar pb-2 mt-4">
-        {EXPLORE_CATEGORIES.map(c => (
+      {/* From Zazi — type filters */}
+      <p className="px-6 mt-4 text-zazi-navy/40 text-[11px] font-bold uppercase tracking-wide">From Zazi</p>
+      <div className="px-6 flex gap-2 overflow-x-auto no-scrollbar pb-2 mt-2">
+        {EXPLORE_FILTERS.map(c => (
           <button
             key={c.id}
-            onClick={() => setCat(c.id)}
+            onClick={() => setTypeFilter(c.id)}
             className={`zazi-tap flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all ${
-              cat === c.id ? 'bg-zazi-orange text-white' : 'bg-white text-zazi-navy/70 shadow-soft'
+              typeFilter === c.id ? 'bg-zazi-orange text-white' : 'bg-white text-zazi-navy/70 shadow-soft'
             }`}
           >
             {c.label}

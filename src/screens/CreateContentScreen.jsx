@@ -4,33 +4,28 @@ import { CONTENT_TYPES } from '../data/content'
 import { useApp } from '../context/AppContext'
 import { Card } from '../components/ui'
 
-const COLORS = {
-  post: '#006E68',
-  video: '#FF8A00',
-  story: '#F4B84C',
-  challenge: '#E8603C',
-  idea: '#0D665F',
-}
-
 export default function CreateContentScreen() {
   const navigate = useNavigate()
   const { stats } = useApp()
 
   return (
     <div className="min-h-screen bg-zazi-cream pb-8">
-      {/* Header */}
-      <div className="flex items-center gap-2 px-6 pt-6 pb-4">
-        <button onClick={() => navigate('/home')} className="w-9 h-9 flex items-center justify-center -ml-1.5">
-          <ChevronLeft size={20} className="text-zazi-navy" />
+      {/* Hero — hook question this screen answers */}
+      <div className="relative w-full overflow-hidden" style={{ height: 220 }}>
+        <img src="/hero/create-hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-zazi-cream via-zazi-cream/15 to-transparent" />
+        <button onClick={() => navigate('/home')} className="absolute top-5 left-5 w-9 h-9 bg-black/25 backdrop-blur rounded-full flex items-center justify-center z-10">
+          <ChevronLeft size={20} className="text-white" />
         </button>
-        <div>
-          <h1 className="text-xl font-extrabold text-zazi-navy">What do you want to create?</h1>
-          <p className="text-zazi-navy/50 text-xs mt-0.5">Your voice belongs on Zazi</p>
+        <div className="absolute bottom-5 left-6 right-6 z-10">
+          <h1 className="text-white text-2xl font-extrabold leading-tight drop-shadow-sm">What do you want to create?</h1>
+          <p className="text-white/80 text-xs mt-1 drop-shadow-sm">Your voice. Your ideas. Your creativity. Your story.</p>
         </div>
       </div>
 
       {/* Creator stats */}
-      <div className="mx-6 rounded-3xl p-5" style={{ background: 'linear-gradient(135deg, #FF8A00, #F4B84C)' }}>
+      <div className="mx-6 mt-4 rounded-3xl p-5" style={{ background: 'linear-gradient(135deg, #FF8A00, #F4B84C)' }}>
         <p className="text-white font-bold text-sm mb-3">Your Creator Stats</p>
         <div className="flex gap-6">
           {[
@@ -49,8 +44,7 @@ export default function CreateContentScreen() {
       {/* What to create */}
       <div className="px-6 mt-6">
         <div className="space-y-3">
-          {CONTENT_TYPES.map(({ id, label, sub, icon: Icon }) => {
-            const color = COLORS[id]
+          {CONTENT_TYPES.map(({ id, label, sub, icon: Icon, color }) => {
             return (
               <Card
                 key={id}

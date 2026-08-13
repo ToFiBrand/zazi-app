@@ -1,24 +1,29 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Settings, Share2, Grid, Clock, PartyPopper, Compass, Palette } from 'lucide-react'
+import { Settings, Share2, Grid, Clock, PartyPopper, Compass, Palette, Sparkles, ChevronRight } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { useAuth } from '../context/AuthContext'
 import { CONTENT_TYPES } from '../data/content'
 import { Avatar, Card, Button, ProgressBar } from '../components/ui'
 
 const STATUS_STYLE = {
-  approved: { bg: '#5F977022', text: '#3F6650', label: 'Published' },
-  pending:  { bg: '#F4B84C26', text: '#8A5F14', label: 'Under Review' },
-  rejected: { bg: '#E8603C1F', text: '#C94B2B', label: 'Needs Changes' },
+  published:     { bg: '#5F977022', text: '#3F6650', label: 'Published' },
+  submitted:     { bg: '#F4B84C26', text: '#8A5F14', label: 'Under Review' },
+  under_review:  { bg: '#F4B84C26', text: '#8A5F14', label: 'Under Review' },
+  needs_changes: { bg: '#E8603C1F', text: '#C94B2B', label: 'Needs Changes' },
+  rejected:      { bg: '#E8603C1F', text: '#C94B2B', label: 'Not Approved' },
+  draft:         { bg: '#17283A14', text: '#5A6B7A', label: 'Draft' },
 }
 
 export default function ProfileScreen() {
   const navigate = useNavigate()
-  const { user, school, stats, pillarProgress, content } = useApp()
+  const { user, school, stats, pillarProgress, contributions } = useApp()
+  const { profile, isGuest } = useAuth()
   const [activeTab, setActiveTab] = useState('creations')
 
   const myContent = useMemo(
-    () => content.filter(c => c.author === `${user.firstName} ${user.lastName[0]}.`),
-    [content, user]
+    () => contributions.filter(c => c.contributorId === profile?.id),
+    [contributions, profile]
   )
 
   const badges = useMemo(() => {
@@ -54,11 +59,28 @@ export default function ProfileScreen() {
 
         {/* User info — limited, no email exposed */}
         <div className="mt-3.5">
-          <h1 className="text-xl font-extrabold text-zazi-navy">{user.firstName} {user.lastName}</h1>
-          <p className="text-zazi-navy/45 text-xs mt-0.5">Grade {user.grade} · {school?.name}</p>
+          <h1 className="text-xl font-extrabold text-zazi-navy">{[user.firstName, user.lastName].filter(Boolean).join(' ')}</h1>
+          <p className="text-zazi-navy/45 text-xs mt-0.5">{[user.grade && `Grade ${user.grade}`, school?.name].filter(Boolean).join(' · ')}</p>
           <p className="text-zazi-teal font-bold text-sm mt-1.5">Dream. Learn. Create. Lead.</p>
           <p className="text-zazi-navy/60 text-sm mt-1 leading-relaxed">{user.bio}</p>
         </div>
+
+        {/* Guest upgrade prompt */}
+        {isGuest && (
+          <button
+            onClick={() => navigate('/save-progress')}
+            className="w-full flex items-center gap-3 bg-zazi-orange/10 border border-zazi-orange/30 rounded-2xl px-4 py-3.5 mt-4 text-left"
+          >
+            <div className="w-9 h-9 bg-zazi-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <Sparkles size={16} className="text-zazi-orange" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-zazi-navy text-sm font-bold">Save your progress</p>
+              <p className="text-zazi-navy/50 text-xs">Turn this guest session into a real Zazi account</p>
+            </div>
+            <ChevronRight size={16} className="text-zazi-navy/30 flex-shrink-0" />
+          </button>
+        )}
 
         {/* My Zazi Journey */}
         <div className="mt-4 p-5 rounded-3xl bg-zazi-navy">
@@ -140,7 +162,7 @@ export default function ProfileScreen() {
         ) : (
           <div className="space-y-3">
             {myContent.map(item => {
-              const st = STATUS_STYLE[item.status]
+              const st = STATUS_STYLE[item.status] || STATUS_STYLE.draft
               const typeInfo = CONTENT_TYPES.find(t => t.id === item.type)
               return (
                 <Card key={item.id} className="p-3 flex gap-3 items-center">
@@ -153,7 +175,7 @@ export default function ProfileScreen() {
                       <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: st.bg, color: st.text }}>
                         {st.label}
                       </span>
-                      {item.status === 'pending' && <Clock size={11} className="text-zazi-navy/30" />}
+                      {(item.status === 'submitted' || item.status === 'under_review') && <Clock size={11} className="text-zazi-navy/30" />}
                     </div>
                   </div>
                 </Card>

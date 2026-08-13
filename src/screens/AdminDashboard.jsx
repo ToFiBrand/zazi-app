@@ -1,37 +1,55 @@
-import { useState } from 'react'
-import { Users, FileText, School, BarChart2, CheckCircle, XCircle, RotateCcw, GraduationCap } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Users, FileText, School, BarChart2, CheckCircle, XCircle, RotateCcw, LogOut, GraduationCap, Layers, Plus, ChevronDown } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { useAuth } from '../context/AuthContext'
+import { supabase } from '../lib/supabase'
 import { PILLARS } from '../data/pillars'
-import { SCHOOLS } from '../data/schools'
 import { CONTENT_TYPES } from '../data/content'
 
 const NAV = [
   { id: 'analytics', label: 'Analytics', icon: BarChart2 },
   { id: 'moderation',label: 'Moderation', icon: FileText },
+  { id: 'topics',    label: 'Topics',    icon: Layers },
   { id: 'schools',   label: 'Schools',   icon: School },
 ]
 
 export default function AdminDashboard() {
-  const { publishedLessons, pendingLessons, content, pendingContent, decideContent, decideLesson, resetDemo } = useApp()
+  const {
+    publishedLessons, pendingLessons, decideLesson,
+    contributions, pendingContributions, decideContribution,
+    topics, addTopic,
+  } = useApp()
+  const { signOut } = useAuth()
   const [activeNav, setActiveNav] = useState('analytics')
+  const [schools, setSchools] = useState([])
+  const [newTopic, setNewTopic] = useState({ pillar: PILLARS[0].id, name: '', description: '' })
+  const [addingTopic, setAddingTopic] = useState(false)
 
-  const handleReset = () => {
-    if (window.confirm('Reset all demo data back to the original seed content? This clears progress, submissions, and moderation decisions on this device.')) {
-      resetDemo()
-    }
+  useEffect(() => {
+    supabase.from('schools').select('*').order('name').then(({ data }) => setSchools(data || []))
+  }, [])
+
+  const handleAddTopic = async () => {
+    if (!newTopic.name.trim()) return
+    setAddingTopic(true)
+    await addTopic({ pillar: newTopic.pillar, name: newTopic.name.trim(), description: newTopic.description.trim() })
+    setAddingTopic(false)
+    setNewTopic({ pillar: newTopic.pillar, name: '', description: '' })
   }
 
-  const totalPending = pendingContent.length + pendingLessons.length
-  const approvedContent = content.filter(c => c.status === 'approved')
+  const pendingStudentContributions = pendingContributions.filter(c => c.contributorRole === 'student')
+  const pendingTeacherContributions = pendingContributions.filter(c => c.contributorRole === 'teacher')
+  const totalPending = pendingContributions.length + pendingLessons.length
+  const publishedContributions = contributions.filter(c => c.status === 'published')
 
   const CAT_DATA = PILLARS.map(p => {
-    const count = content.filter(c => c.pillar === p.id).length + publishedLessons.filter(l => l.pillar === p.id).length
+    const count = publishedContributions.filter(c => c.pillar === p.id).length + publishedLessons.filter(l => l.pillar === p.id).length
     return { label: p.short, color: p.color, count }
   })
   const maxCat = Math.max(1, ...CAT_DATA.map(c => c.count))
 
   return (
-    <div className="flex h-screen bg-gray-50 rounded-none md:rounded-2xl overflow-hidden md:shadow-2xl">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar */}
       <aside className="bg-zazi-navy flex flex-col py-6 w-16 md:w-56 transition-all">
         <div className="px-4 mb-6 hidden md:flex items-center gap-2">
@@ -58,9 +76,9 @@ export default function AdminDashboard() {
           ))}
         </nav>
 
-        <button onClick={handleReset} className="flex items-center gap-3 px-5 py-3 text-gray-500 hover:text-gray-300 text-sm">
-          <RotateCcw size={16} />
-          <span className="hidden md:block">Reset Demo Data</span>
+        <button onClick={signOut} className="flex items-center gap-3 px-5 py-3 text-gray-500 hover:text-gray-300 text-sm">
+          <LogOut size={16} />
+          <span className="hidden md:block">Logout</span>
         </button>
       </aside>
 
@@ -76,9 +94,9 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {[
                 { label: 'Total Lessons',      val: publishedLessons.length, icon: GraduationCap, color: '#006E68' },
-                { label: 'Student Content',    val: approvedContent.length,  icon: FileText,       color: '#FF8A00' },
+                { label: 'Contributions',      val: publishedContributions.length, icon: FileText, color: '#FF8A00' },
                 { label: 'Pending Moderation', val: totalPending,            icon: Users,          color: '#0D665F' },
-                { label: 'Schools',            val: SCHOOLS.length,          icon: School,         color: '#F4B84C' },
+                { label: 'Schools',            val: schools.length,          icon: School,         color: '#F4B84C' },
               ].map(k => (
                 <div key={k.label} className="bg-white rounded-2xl p-4 shadow-card">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: k.color + '20' }}>
@@ -116,43 +134,36 @@ export default function AdminDashboard() {
               <p className="text-zazi-muted text-sm">Review student submissions and contributor lessons before they go live</p>
             </div>
 
-            {/* Student content queue */}
+            {/* Student contributions queue */}
             <div className="bg-white rounded-2xl p-5 shadow-card mb-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-black text-zazi-navy text-sm">Student Submissions</h3>
-                <span className="bg-zazi-orange text-white text-xs font-bold px-3 py-1 rounded-full">{pendingContent.length} Pending</span>
+                <span className="bg-zazi-orange text-white text-xs font-bold px-3 py-1 rounded-full">{pendingStudentContributions.length} Pending</span>
               </div>
-              {pendingContent.length === 0 ? (
+              {pendingStudentContributions.length === 0 ? (
                 <EmptyQueue />
               ) : (
                 <div className="space-y-3">
-                  {pendingContent.map(item => {
-                    const typeInfo = CONTENT_TYPES.find(t => t.id === item.type)
-                    return (
-                      <div key={item.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: item.color + '20' }}>
-                          {typeInfo && <typeInfo.icon size={18} style={{ color: item.color }} />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-zazi-navy font-bold text-sm truncate">{item.title}</p>
-                          <div className="flex items-center gap-2 mt-1 flex-wrap">
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: item.color + '20', color: item.color }}>
-                              {typeInfo?.label}
-                            </span>
-                            <span className="text-zazi-muted text-[10px]">by {item.author} · {item.school}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <button onClick={() => decideContent(item.id, 'approved')} className="w-8 h-8 rounded-full border-2 border-green-500 flex items-center justify-center hover:bg-green-50">
-                            <CheckCircle size={16} className="text-green-500" />
-                          </button>
-                          <button onClick={() => decideContent(item.id, 'rejected', 'Does not meet content guidelines')} className="w-8 h-8 rounded-full border-2 border-red-400 flex items-center justify-center hover:bg-red-50">
-                            <XCircle size={16} className="text-red-400" />
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  })}
+                  {pendingStudentContributions.map(item => (
+                    <ContributionRow key={item.id} item={item} decide={decideContribution} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Verified educator contributions queue */}
+            <div className="bg-white rounded-2xl p-5 shadow-card mb-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-black text-zazi-navy text-sm">Educator Submissions</h3>
+                <span className="bg-zazi-teal text-white text-xs font-bold px-3 py-1 rounded-full">{pendingTeacherContributions.length} Pending</span>
+              </div>
+              {pendingTeacherContributions.length === 0 ? (
+                <EmptyQueue label="No educator submissions pending." />
+              ) : (
+                <div className="space-y-3">
+                  {pendingTeacherContributions.map(item => (
+                    <ContributionRow key={item.id} item={item} decide={decideContribution} />
+                  ))}
                 </div>
               )}
             </div>
@@ -192,6 +203,76 @@ export default function AdminDashboard() {
           </>
         )}
 
+        {activeNav === 'topics' && (
+          <>
+            <div className="mb-6">
+              <h1 className="text-xl font-black text-zazi-navy">Topics</h1>
+              <p className="text-zazi-muted text-sm">The taxonomy contributors pick from when authoring a lesson — Pillar → Topic → Lesson</p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 shadow-card mb-5">
+              <h3 className="font-black text-zazi-navy text-sm mb-4">Add a Topic</h3>
+              <div className="grid md:grid-cols-3 gap-3">
+                <div className="relative">
+                  <select
+                    value={newTopic.pillar}
+                    onChange={e => setNewTopic(t => ({ ...t, pillar: e.target.value }))}
+                    className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none"
+                  >
+                    {PILLARS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-zazi-muted pointer-events-none" />
+                </div>
+                <input
+                  value={newTopic.name}
+                  onChange={e => setNewTopic(t => ({ ...t, name: e.target.value }))}
+                  placeholder="Topic name"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none"
+                />
+                <input
+                  value={newTopic.description}
+                  onChange={e => setNewTopic(t => ({ ...t, description: e.target.value }))}
+                  placeholder="Short description (optional)"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none"
+                />
+              </div>
+              <button
+                onClick={handleAddTopic}
+                disabled={!newTopic.name.trim() || addingTopic}
+                className="mt-3 flex items-center gap-2 bg-zazi-orange text-white font-bold text-sm px-4 py-2.5 rounded-xl disabled:opacity-40 disabled:pointer-events-none"
+              >
+                <Plus size={16} />
+                {addingTopic ? 'Adding...' : 'Add Topic'}
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {PILLARS.map(p => {
+                const pillarTopics = topics.filter(t => t.pillar === p.id)
+                return (
+                  <div key={p.id} className="bg-white rounded-2xl p-5 shadow-card">
+                    <h3 className="font-black text-zazi-navy text-sm mb-3 flex items-center gap-1.5">
+                      <p.icon size={14} style={{ color: p.color }} /> {p.name}
+                    </h3>
+                    {pillarTopics.length === 0 ? (
+                      <p className="text-zazi-muted text-xs">No topics yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {pillarTopics.map(t => (
+                          <div key={t.id} className="px-3 py-2.5 bg-gray-50 rounded-xl">
+                            <p className="text-zazi-navy font-bold text-sm">{t.name}</p>
+                            {t.description && <p className="text-zazi-muted text-xs mt-0.5">{t.description}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        )}
+
         {activeNav === 'schools' && (
           <>
             <div className="mb-6">
@@ -199,8 +280,8 @@ export default function AdminDashboard() {
               <p className="text-zazi-muted text-sm">Participating schools across South Africa</p>
             </div>
             <div className="bg-white rounded-2xl shadow-card overflow-hidden">
-              {SCHOOLS.map((s, i) => (
-                <div key={s.id} className={`flex items-center justify-between px-5 py-3 ${i !== SCHOOLS.length - 1 ? 'border-b border-gray-100' : ''}`}>
+              {schools.map((s, i) => (
+                <div key={s.id} className={`flex items-center justify-between px-5 py-3 ${i !== schools.length - 1 ? 'border-b border-gray-100' : ''}`}>
                   <div>
                     <p className="text-zazi-navy font-bold text-sm">{s.name}</p>
                     <p className="text-zazi-muted text-xs">{s.district}, {s.province}</p>
@@ -221,6 +302,37 @@ function EmptyQueue({ label = 'All caught up! No submissions pending.' }) {
     <div className="text-center py-8 text-zazi-muted text-sm">
       <CheckCircle size={32} className="text-green-500 mx-auto mb-2" />
       {label}
+    </div>
+  )
+}
+
+function ContributionRow({ item, decide }) {
+  const typeInfo = CONTENT_TYPES.find(t => t.id === item.type)
+  return (
+    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: item.color + '20' }}>
+        {typeInfo && <typeInfo.icon size={18} style={{ color: item.color }} />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-zazi-navy font-bold text-sm truncate">{item.title}</p>
+        <div className="flex items-center gap-2 mt-1 flex-wrap">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: item.color + '20', color: item.color }}>
+            {typeInfo?.label || item.type}
+          </span>
+          <span className="text-zazi-muted text-[10px]">by {item.author}{item.school ? ` · ${item.school}` : ''}{item.pillar ? ` · ${item.pillar}` : ''}</span>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <button onClick={() => decide(item.id, 'approved')} title="Approve" className="w-8 h-8 rounded-full border-2 border-green-500 flex items-center justify-center hover:bg-green-50">
+          <CheckCircle size={16} className="text-green-500" />
+        </button>
+        <button onClick={() => decide(item.id, 'needs_changes', 'Please review and resubmit')} title="Request Changes" className="w-8 h-8 rounded-full border-2 border-amber-400 flex items-center justify-center hover:bg-amber-50">
+          <RotateCcw size={15} className="text-amber-500" />
+        </button>
+        <button onClick={() => decide(item.id, 'rejected', 'Does not meet content guidelines')} title="Reject" className="w-8 h-8 rounded-full border-2 border-red-400 flex items-center justify-center hover:bg-red-50">
+          <XCircle size={16} className="text-red-400" />
+        </button>
+      </div>
     </div>
   )
 }

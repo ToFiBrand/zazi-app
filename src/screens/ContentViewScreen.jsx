@@ -14,8 +14,8 @@ const COMMENTS = [
 export default function ContentViewScreen() {
   const navigate = useNavigate()
   const { contentId } = useParams()
-  const { approvedContent, user } = useApp()
-  const item = approvedContent.find(c => c.id === contentId)
+  const { publishedContributions, user } = useApp()
+  const item = publishedContributions.find(c => c.id === contentId)
   const [liked, setLiked] = useState(false)
 
   const handleShare = async () => {

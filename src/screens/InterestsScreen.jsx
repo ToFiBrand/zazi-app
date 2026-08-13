@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, Briefcase, Code2, HeartHandshake, PenLine, TrendingUp, Newspaper, PiggyBank, FlaskConical, Check } from 'lucide-react'
 import Button from '../components/ui/Button'
 import ProgressBar from '../components/ui/ProgressBar'
+import { useApp } from '../context/AppContext'
 
 const INTERESTS = [
   { id: 'career',  label: 'Career Development', icon: Briefcase,      color: '#FF8A00' },
@@ -17,13 +18,21 @@ const INTERESTS = [
 
 export default function InterestsScreen() {
   const navigate = useNavigate()
+  const { updateInterests } = useApp()
   const [selected, setSelected] = useState(['career', 'tech'])
+  const [submitting, setSubmitting] = useState(false)
 
   const toggle = (id) =>
     setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id])
 
+  const handleContinue = async () => {
+    setSubmitting(true)
+    await updateInterests(selected)
+    navigate('/home')
+  }
+
   return (
-    <div className="min-h-screen md:min-h-0 bg-zazi-cream flex flex-col pb-8">
+    <div className="min-h-screen bg-zazi-cream flex flex-col pb-8 md:max-w-lg md:mx-auto md:w-full">
       {/* Header */}
       <div className="flex items-center justify-between px-6 pt-6 pb-2">
         <button onClick={() => navigate('/signup')} className="flex items-center gap-1 text-zazi-navy">
@@ -76,8 +85,8 @@ export default function InterestsScreen() {
 
       {/* CTA */}
       <div className="px-6 mt-6">
-        <Button variant="primary" size="lg" full onClick={() => navigate('/home')} disabled={selected.length < 3}>
-          Continue
+        <Button variant="primary" size="lg" full onClick={handleContinue} disabled={selected.length < 3 || submitting}>
+          {submitting ? 'Saving...' : 'Continue'}
         </Button>
       </div>
     </div>

@@ -1,9 +1,18 @@
-import { useMemo, useState } from 'react'
-import { Upload, Users, Eye, TrendingUp, Plus, Clock, ChevronDown } from 'lucide-react'
+import { useMemo, useState, useEffect } from 'react'
+import { Upload, Users, Eye, TrendingUp, Plus, Clock, ChevronDown, BadgeCheck, Pencil } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { useAuth } from '../context/AuthContext'
+import { Avatar } from '../components/ui'
 import { PILLARS } from '../data/pillars'
 
-const TEACHER_NAME = 'Sipho Mthembu'
+const GRADES = [7, 8, 9, 10, 11, 12]
+
+const VERIFICATION_STYLE = {
+  approved: { bg: '#5F977022', text: '#3F6650', label: 'Verified Educator' },
+  pending:  { bg: '#F4B84C26', text: '#8A5F14', label: 'Verification Pending' },
+  rejected: { bg: '#E8603C1F', text: '#C94B2B', label: 'Not Verified' },
+  none:     { bg: '#17283A14', text: '#5A6B7A', label: 'Not Verified' },
+}
 
 const STATUS_STYLE = {
   published: { bg: '#dcfce7', text: '#16a34a', label: 'Published' },
@@ -12,34 +21,64 @@ const STATUS_STYLE = {
 }
 
 const emptyDraft = {
-  title: '', description: '', pillar: PILLARS[0].id, gradeMin: 7, gradeMax: 9,
+  title: '', description: '', pillar: PILLARS[0].id, topicId: '', gradeMin: 7, gradeMax: 9,
   objective: '', resourceName: '', activity: '', discussion: '', duration: 10,
 }
 
 export default function TeacherDashboard() {
-  const { lessons, addLesson } = useApp()
+  const { user, lessons, topics, school, addLesson, updateTeacherProfile } = useApp()
+  const { profile } = useAuth()
   const [showUpload, setShowUpload] = useState(false)
   const [draft, setDraft] = useState(emptyDraft)
+  const [editingProfile, setEditingProfile] = useState(false)
+  const [profileDraft, setProfileDraft] = useState({ subjects: '', teachingGrades: [], bio: '' })
+  const [savingProfile, setSavingProfile] = useState(false)
 
-  const myLessons = useMemo(() => lessons.filter(l => l.contributor === TEACHER_NAME), [lessons])
+  useEffect(() => {
+    if (user) setProfileDraft({ subjects: (user.subjects || []).join(', '), teachingGrades: user.teachingGrades || [], bio: user.bio || '' })
+  }, [user?.subjects, user?.teachingGrades, user?.bio])
+
+  const topicsForPillar = topics.filter(t => t.pillar === draft.pillar)
+
+  const teacherName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : ''
+  const myLessons = useMemo(() => lessons.filter(l => l.contributorId === profile?.id), [lessons, profile])
   const totalViews = myLessons.reduce((sum, l) => sum + l.views, 0)
   const avgCompletion = myLessons.length
     ? Math.round(myLessons.reduce((sum, l) => sum + (l.completions / Math.max(l.views, 1)) * 100, 0) / myLessons.length)
     : 0
 
+  const verification = VERIFICATION_STYLE[user?.verificationStatus] || VERIFICATION_STYLE.none
+
+  const toggleTeachingGrade = (g) =>
+    setProfileDraft(d => ({ ...d, teachingGrades: d.teachingGrades.includes(g) ? d.teachingGrades.filter(x => x !== g) : [...d.teachingGrades, g].sort() }))
+
+  const saveProfile = async () => {
+    setSavingProfile(true)
+    await updateTeacherProfile({
+      subjects: profileDraft.subjects.split(',').map(s => s.trim()).filter(Boolean),
+      teachingGrades: profileDraft.teachingGrades,
+      bio: profileDraft.bio,
+    })
+    setSavingProfile(false)
+    setEditingProfile(false)
+  }
+
   const set = (k) => (e) => setDraft(d => ({ ...d, [k]: e.target.value }))
+  const setPillar = (e) => setDraft(d => ({ ...d, pillar: e.target.value, topicId: '' }))
+
+  const canSubmit = draft.title.trim() && draft.topicId
 
   const submitLesson = () => {
-    if (!draft.title.trim()) return
+    if (!canSubmit) return
     const pillar = PILLARS.find(p => p.id === draft.pillar)
     addLesson({
       title: draft.title.trim(),
       description: draft.description.trim() || 'A new lesson from a Zazi contributor.',
       pillar: draft.pillar,
+      topicId: draft.topicId,
       gradeMin: Number(draft.gradeMin),
       gradeMax: Number(draft.gradeMax),
       duration: Number(draft.duration) || 10,
-      contributor: TEACHER_NAME,
       contributorRole: 'Tech Educator',
       color: pillar.color,
       objectives: draft.objective ? [draft.objective] : ['To be added by contributor'],
@@ -53,13 +92,10 @@ export default function TeacherDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6 rounded-none md:rounded-2xl">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-        <div>
-          <h1 className="text-2xl font-black text-zazi-navy">Welcome, {TEACHER_NAME.split(' ')[0]}</h1>
-          <p className="text-zazi-muted text-sm">{TEACHER_NAME} · Tech Educator · Soweto High School</p>
-        </div>
+        <h1 className="text-2xl font-black text-zazi-navy">Welcome, {profile?.first_name}</h1>
         <button
           onClick={() => setShowUpload(true)}
           className="flex items-center justify-center gap-2 bg-zazi-orange text-white font-bold text-sm px-4 py-2.5 rounded-xl whitespace-nowrap self-start"
@@ -67,6 +103,78 @@ export default function TeacherDashboard() {
           <Plus size={16} />
           Create Lesson
         </button>
+      </div>
+
+      {/* Educator profile */}
+      <div className="bg-white rounded-2xl p-5 shadow-card mb-6">
+        <div className="flex items-start gap-4">
+          <Avatar avatarId={user?.avatarId} size="lg" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-zazi-navy font-black text-base">{teacherName}</p>
+              <span
+                className="text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1"
+                style={{ background: verification.bg, color: verification.text }}
+              >
+                <BadgeCheck size={11} />
+                {verification.label}
+              </span>
+            </div>
+            <p className="text-zazi-muted text-xs mt-0.5">{school ? school.name : 'No school on file'}</p>
+
+            {!editingProfile ? (
+              <>
+                <p className="text-zazi-navy/70 text-sm mt-2">{user?.bio || 'No bio yet.'}</p>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {(user?.subjects || []).map(s => (
+                    <span key={s} className="text-[10px] font-semibold px-2 py-1 rounded-full bg-zazi-teal/10 text-zazi-teal">{s}</span>
+                  ))}
+                  {(user?.teachingGrades || []).length > 0 && (
+                    <span className="text-[10px] font-semibold px-2 py-1 rounded-full bg-zazi-orange/10 text-zazi-orange">
+                      Grades {user.teachingGrades.join(', ')}
+                    </span>
+                  )}
+                </div>
+                <button onClick={() => setEditingProfile(true)} className="flex items-center gap-1 text-zazi-teal text-xs font-bold mt-3">
+                  <Pencil size={12} /> Edit Educator Profile
+                </button>
+              </>
+            ) : (
+              <div className="mt-3 space-y-2.5">
+                <input
+                  value={profileDraft.subjects}
+                  onChange={e => setProfileDraft(d => ({ ...d, subjects: e.target.value }))}
+                  placeholder="Subjects, comma separated (e.g. Life Orientation, Economics)"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none"
+                />
+                <div className="flex flex-wrap gap-1.5">
+                  {GRADES.map(g => (
+                    <button
+                      key={g}
+                      onClick={() => toggleTeachingGrade(g)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-bold ${profileDraft.teachingGrades.includes(g) ? 'bg-zazi-orange text-white' : 'bg-gray-100 text-zazi-muted'}`}
+                    >
+                      Gr {g}
+                    </button>
+                  ))}
+                </div>
+                <textarea
+                  value={profileDraft.bio}
+                  onChange={e => setProfileDraft(d => ({ ...d, bio: e.target.value }))}
+                  rows={2}
+                  placeholder="Short bio"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none resize-none"
+                />
+                <div className="flex gap-2">
+                  <button onClick={saveProfile} disabled={savingProfile} className="bg-zazi-orange text-white text-xs font-bold px-4 py-2 rounded-xl disabled:opacity-50">
+                    {savingProfile ? 'Saving...' : 'Save'}
+                  </button>
+                  <button onClick={() => setEditingProfile(false)} className="text-zazi-muted text-xs font-bold px-4 py-2">Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Stats */}
@@ -163,11 +271,21 @@ export default function TeacherDashboard() {
                 </div>
               </div>
               <div className="relative">
-                <select value={draft.pillar} onChange={set('pillar')} className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none">
+                <select value={draft.pillar} onChange={setPillar} className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none">
                   {PILLARS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
                 <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-zazi-muted pointer-events-none" />
               </div>
+              <div className="relative">
+                <select value={draft.topicId} onChange={set('topicId')} className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none">
+                  <option value="">{topicsForPillar.length ? 'Select a topic' : 'No topics yet for this pillar'}</option>
+                  {topicsForPillar.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-zazi-muted pointer-events-none" />
+              </div>
+              {topicsForPillar.length === 0 && (
+                <p className="text-zazi-muted text-xs -mt-1">Ask an admin to add a topic for this pillar first — lessons need a topic to live under.</p>
+              )}
               <input value={draft.objective} onChange={set('objective')} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none" placeholder="Main learning objective" />
               <input value={draft.activity} onChange={set('activity')} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none" placeholder="Take Action activity" />
               <input value={draft.discussion} onChange={set('discussion')} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none" placeholder="Discussion question" />
@@ -181,7 +299,11 @@ export default function TeacherDashboard() {
                 <p className="text-zazi-muted text-xs">MP4, MOV up to 500MB</p>
               </div>
               <p className="text-zazi-muted text-xs">Your lesson will be submitted for review before it's published to learners.</p>
-              <button onClick={submitLesson} className="w-full bg-zazi-orange text-white font-bold py-3.5 rounded-xl">
+              <button
+                onClick={submitLesson}
+                disabled={!canSubmit}
+                className="w-full bg-zazi-orange text-white font-bold py-3.5 rounded-xl disabled:opacity-40 disabled:pointer-events-none"
+              >
                 Submit for Review
               </button>
             </div>
