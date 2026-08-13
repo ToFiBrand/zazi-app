@@ -15,19 +15,16 @@ const FEATURES = [
 const SLIDES = [
   {
     video: '/video/welcome.mp4',
-    poster: '/hero/welcome.jpg',
     title: 'Welcome to Zazi',
     body: "This is the city where you build the skills school doesn't always teach — entrepreneurship, tech, money, leadership and more.",
   },
   {
     video: '/video/what-youll-find.mp4',
-    poster: '/hero/what-youll-find.jpg',
     title: "What You'll Find Here",
     features: true,
   },
   {
     video: '/video/you-belong.mp4',
-    poster: '/hero/you-belong.jpg',
     title: 'You Belong Here',
     subtitle: 'Zazi means "to know yourself"',
     body: 'A platform made by youth, for youth. Your voice matters. Your ideas matter. Your story matters.',
@@ -47,7 +44,6 @@ export default function OnboardingScreen() {
       <div className="relative w-full flex-1 min-h-0 overflow-hidden" key={slide}>
         <video
           src={s.video}
-          poster={s.poster}
           autoPlay
           loop
           muted

@@ -13,7 +13,6 @@ export default function SplashScreen() {
     >
       <video
         src="/video/app-opening.mp4"
-        poster="/hero/app-opening.jpg"
         autoPlay
         loop
         muted
@@ -22,7 +21,7 @@ export default function SplashScreen() {
       />
 
       <div className="relative z-10 flex flex-col items-center gap-3 zazi-fade-up">
-        <img src="/logo-v.svg" alt="Zazi" className="w-[130px] h-auto drop-shadow-lg" />
+        <img src="/logo-v.svg" alt="Zazi" className="w-[130px] h-auto brightness-0 drop-shadow-lg" />
         <p className="text-zazi-navy text-sm font-semibold tracking-wide">Know Yourself. Grow Yourself.</p>
       </div>
 

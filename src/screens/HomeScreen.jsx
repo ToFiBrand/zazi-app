@@ -33,7 +33,14 @@ export default function HomeScreen() {
     <div className="min-h-screen bg-zazi-cream flex flex-col pb-[76px] md:pb-10">
       {/* Hero — the hook question every visit opens with */}
       <div className="relative w-full overflow-hidden" style={{ height: 400 }}>
-        <img src="/hero/enter-zazi.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <video
+          src="/video/build-your-future.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/35 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-zazi-navy via-zazi-navy/60 to-transparent" />
 
