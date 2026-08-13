@@ -11,10 +11,17 @@ export default function CreateContentScreen() {
   return (
     <div className="min-h-screen bg-zazi-cream pb-8">
       {/* Hero — hook question this screen answers */}
-      <div className="relative w-full overflow-hidden" style={{ height: 220 }}>
-        <img src="/hero/create-hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-zazi-cream via-zazi-cream/15 to-transparent" />
+      <div className="relative w-full overflow-hidden" style={{ height: 400 }}>
+        <video
+          src="/video/create.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/35 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-zazi-navy via-zazi-navy/60 to-transparent" />
         <button onClick={() => navigate('/home')} className="absolute top-5 left-5 w-9 h-9 bg-black/25 backdrop-blur rounded-full flex items-center justify-center z-10">
           <ChevronLeft size={20} className="text-white" />
         </button>

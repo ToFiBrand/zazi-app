@@ -41,11 +41,12 @@ export default function ContentViewScreen() {
   return (
     <div className="min-h-screen bg-zazi-cream flex flex-col">
       {/* Hero */}
-      <div className="relative w-full flex items-center justify-center" style={{ height: 220, background: item.color + '1C' }}>
-        <button onClick={() => navigate('/explore')} className="absolute top-4 left-4 w-9 h-9 bg-black/20 backdrop-blur rounded-full flex items-center justify-center">
+      <div className="relative w-full flex items-center justify-center overflow-hidden" style={{ height: 220, background: item.color + '1C' }}>
+        {item.imageUrl && <img src={item.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+        <button onClick={() => navigate('/explore')} className="absolute top-4 left-4 w-9 h-9 bg-black/20 backdrop-blur rounded-full flex items-center justify-center z-10">
           <ChevronLeft size={18} className="text-white" />
         </button>
-        {typeInfo ? <typeInfo.icon size={56} style={{ color: item.color }} /> : <Sparkles size={56} className="text-zazi-navy/30" />}
+        {!item.imageUrl && (typeInfo ? <typeInfo.icon size={56} style={{ color: item.color }} /> : <Sparkles size={56} className="text-zazi-navy/30" />)}
       </div>
 
       {/* Content */}

@@ -21,7 +21,22 @@ export default function SplashScreen() {
       />
 
       <div className="relative z-10 flex flex-col items-center gap-3 zazi-fade-up">
-        <img src="/logo-v.svg" alt="Zazi" className="w-[130px] h-auto brightness-0 drop-shadow-lg" />
+        <div
+          role="img"
+          aria-label="Zazi"
+          className="w-[130px] bg-zazi-navy drop-shadow-lg"
+          style={{
+            aspectRatio: '300.43 / 446.66',
+            WebkitMaskImage: 'url(/logo-v.svg)',
+            maskImage: 'url(/logo-v.svg)',
+            WebkitMaskSize: 'contain',
+            maskSize: 'contain',
+            WebkitMaskRepeat: 'no-repeat',
+            maskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+            maskPosition: 'center',
+          }}
+        />
         <p className="text-zazi-navy text-sm font-semibold tracking-wide">Know Yourself. Grow Yourself.</p>
       </div>
 

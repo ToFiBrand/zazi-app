@@ -24,10 +24,17 @@ export default function ExploreScreen() {
   return (
     <div className="min-h-screen bg-zazi-cream flex flex-col pb-[76px] md:pb-10">
       {/* Hero — hook question this screen answers */}
-      <div className="relative w-full overflow-hidden" style={{ height: 220 }}>
-        <img src="/hero/explore-hero.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-zazi-cream via-zazi-cream/15 to-transparent" />
+      <div className="relative w-full overflow-hidden" style={{ height: 400 }}>
+        <video
+          src="/video/explore.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/35 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-zazi-navy via-zazi-navy/60 to-transparent" />
         <h1 className="absolute bottom-5 left-6 right-6 text-white text-2xl font-extrabold leading-tight drop-shadow-sm z-10">
           What's the crew creating?
         </h1>
@@ -74,7 +81,16 @@ export default function ExploreScreen() {
             return (
             <button key={item.id} onClick={() => navigate(`/explore/${item.id}`)} className="zazi-tap text-left">
               <div className="w-full rounded-2xl relative overflow-hidden flex items-center justify-center" style={{ height: 130, background: item.color + '1C' }}>
-                {TypeIcon && <TypeIcon size={34} style={{ color: item.color }} />}
+                {item.imageUrl ? (
+                  <img src={item.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  TypeIcon && <TypeIcon size={34} style={{ color: item.color }} />
+                )}
+                {item.imageUrl && TypeIcon && (
+                  <div className="absolute bottom-2 left-2 w-6 h-6 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                    <TypeIcon size={12} className="text-white" />
+                  </div>
+                )}
                 <div className="absolute top-2 right-2 bg-black/25 backdrop-blur rounded-full px-2 py-0.5 flex items-center gap-1">
                   <Eye size={10} className="text-white" />
                   <span className="text-white text-[9px] font-medium">{item.views}</span>
