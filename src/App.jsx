@@ -11,6 +11,10 @@ import OnboardingScreen from './screens/OnboardingScreen'
 import AuthScreen from './screens/AuthScreen'
 import LoginScreen from './screens/LoginScreen'
 import SignUpScreen from './screens/SignUpScreen'
+import ForgotPasswordScreen from './screens/ForgotPasswordScreen'
+import ResetPasswordScreen from './screens/ResetPasswordScreen'
+import TermsScreen from './screens/TermsScreen'
+import PrivacyScreen from './screens/PrivacyScreen'
 import InterestsScreen from './screens/InterestsScreen'
 import CreateAvatarScreen from './screens/CreateAvatarScreen'
 import HomeScreen from './screens/HomeScreen'
@@ -44,6 +48,10 @@ export default function App() {
               <Route path="/welcome" element={<AuthScreen />} />
               <Route path="/login" element={<LoginScreen />} />
               <Route path="/signup" element={<SignUpScreen />} />
+              <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
+              <Route path="/reset-password" element={<ResetPasswordScreen />} />
+              <Route path="/terms" element={<TermsScreen />} />
+              <Route path="/privacy" element={<PrivacyScreen />} />
               <Route path="/interests" element={<InterestsScreen />} />
               <Route path="/create-avatar" element={<CreateAvatarScreen />} />
             </Route>

@@ -83,6 +83,18 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut()
   }, [])
 
+  const resetPasswordForEmail = useCallback(async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    return { error }
+  }, [])
+
+  const updatePassword = useCallback(async (newPassword) => {
+    const { data, error } = await supabase.auth.updateUser({ password: newPassword })
+    return { data, error }
+  }, [])
+
   const refreshProfile = useCallback(() => {
     if (session?.user) return loadProfile(session.user.id)
   }, [session, loadProfile])
@@ -100,6 +112,8 @@ export function AuthProvider({ children }) {
     upgradeGuest,
     signOut,
     refreshProfile,
+    resetPasswordForEmail,
+    updatePassword,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

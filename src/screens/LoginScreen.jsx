@@ -54,7 +54,12 @@ export default function LoginScreen() {
             />
           </div>
           <div>
-            <label className="block text-zazi-navy font-semibold text-sm mb-1.5">Password</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-zazi-navy font-semibold text-sm">Password</label>
+              <button type="button" onClick={() => navigate('/forgot-password')} className="text-zazi-orange text-xs font-semibold">
+                Forgot password?
+              </button>
+            </div>
             <input
               type="password"
               autoComplete="current-password"

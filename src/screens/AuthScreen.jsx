@@ -69,7 +69,9 @@ export default function AuthScreen() {
 
         <p className="text-white/40 text-xs text-center mt-4">
           By continuing, you agree to our{' '}
-          <span className="text-white/70 font-semibold">Terms &amp; Privacy Policy</span>
+          <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-white/70 font-semibold">Terms</a>
+          {' '}&amp;{' '}
+          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-white/70 font-semibold">Privacy Policy</a>
         </p>
       </div>
     </div>
