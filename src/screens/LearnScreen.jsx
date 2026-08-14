@@ -19,7 +19,8 @@ export default function LearnScreen() {
     return publishedLessons.filter(l => {
       const inGrade = grade >= l.gradeMin && grade <= l.gradeMax
       const inPillar = pillar === 'all' || l.pillar === pillar
-      const inQuery = !query || l.title.toLowerCase().includes(query.toLowerCase())
+      const q = query.toLowerCase()
+      const inQuery = !query || l.title.toLowerCase().includes(q) || (l.description || '').toLowerCase().includes(q)
       return inGrade && inPillar && inQuery
     })
   }, [publishedLessons, grade, pillar, query])

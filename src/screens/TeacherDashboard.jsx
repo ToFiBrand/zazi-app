@@ -108,7 +108,7 @@ export default function TeacherDashboard() {
       {/* Educator profile */}
       <div className="bg-white rounded-2xl p-5 shadow-card mb-6">
         <div className="flex items-start gap-4">
-          <Avatar avatarId={user?.avatarId} size="lg" />
+          <Avatar avatarId={user?.avatarId} customization={user?.avatarCustomization} size="lg" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-zazi-navy font-black text-base">{teacherName}</p>

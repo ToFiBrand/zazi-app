@@ -13,11 +13,12 @@ const DISCUSSION_REPLIES = [
 export default function LessonDetailScreen() {
   const navigate = useNavigate()
   const { lessonId } = useParams()
-  const { lessons, topics, quizQuestions, progress, startLesson, completeLesson, user } = useApp()
+  const { lessons, topics, quizQuestions, progress, startLesson, completeLesson, submitQuiz, user } = useApp()
   const lesson = lessons.find(l => l.id === lessonId)
   const topic = topics.find(t => t.id === lesson?.topicId)
   const lessonQuiz = useMemo(() => quizQuestions.filter(q => q.lessonId === lessonId).sort((a, b) => a.sortOrder - b.sortOrder), [quizQuestions, lessonId])
   const [justCompleted, setJustCompleted] = useState(false)
+  const [videoStarted, setVideoStarted] = useState(false)
   const [comment, setComment] = useState('')
   const [resourceOpen, setResourceOpen] = useState(false)
   const [quizAnswers, setQuizAnswers] = useState({})
@@ -63,29 +64,48 @@ export default function LessonDetailScreen() {
         className="relative w-full flex items-center justify-center flex-shrink-0 overflow-hidden"
         style={{ height: 220, background: `linear-gradient(135deg, ${lesson.color}, ${pillar?.color || lesson.color})` }}
       >
-        {lesson.coverImageUrl && (
-          <img src={lesson.coverImageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        {lesson.videoUrl && videoStarted ? (
+          <video src={lesson.videoUrl} controls autoPlay playsInline poster={lesson.coverImageUrl || undefined} className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          <>
+            {lesson.coverImageUrl && (
+              <img src={lesson.coverImageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            )}
+            {!lesson.coverImageUrl && <pillar.icon size={72} className="text-white/15 absolute" />}
+          </>
         )}
-        <button onClick={() => navigate('/learn')} className="absolute top-4 left-4 w-9 h-9 bg-black/25 backdrop-blur rounded-full flex items-center justify-center z-10">
-          <ChevronLeft size={18} className="text-white" />
-        </button>
-        {!lesson.coverImageUrl && <pillar.icon size={72} className="text-white/15 absolute" />}
-        <div className="absolute top-4 right-4 flex flex-col items-end gap-1.5 z-10">
-          <Chip color={pillar.color} tone="solid" icon={<pillar.icon size={11} />}>{pillar.short}</Chip>
-          <div className="bg-black/40 backdrop-blur rounded-full px-2.5 py-1 flex items-center gap-1">
-            <Clock size={11} className="text-white" />
-            <span className="text-white text-[11px] font-medium">{lesson.duration} min</span>
+        {!(lesson.videoUrl && videoStarted) && (
+          <button onClick={() => navigate('/learn')} className="absolute top-4 left-4 w-9 h-9 bg-black/25 backdrop-blur rounded-full flex items-center justify-center z-10">
+            <ChevronLeft size={18} className="text-white" />
+          </button>
+        )}
+        {!(lesson.videoUrl && videoStarted) && (
+          <div className="absolute top-4 right-4 flex flex-col items-end gap-1.5 z-10">
+            <Chip color={pillar.color} tone="solid" icon={<pillar.icon size={11} />}>{pillar.short}</Chip>
+            <div className="bg-black/40 backdrop-blur rounded-full px-2.5 py-1 flex items-center gap-1">
+              <Clock size={11} className="text-white" />
+              <span className="text-white text-[11px] font-medium">{lesson.duration} min</span>
+            </div>
           </div>
-        </div>
-        <button className="zazi-tap w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl relative z-10">
-          <Play size={26} className="text-zazi-orange fill-zazi-orange ml-1" />
-        </button>
-        {/* Scrim keeps the title legible over any cover image */}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-        <h1 className="absolute bottom-4 left-4 right-4 text-white font-extrabold text-xl leading-snug drop-shadow-sm z-10">
-          {lesson.title}
-        </h1>
+        )}
+        {lesson.videoUrl && !videoStarted && (
+          <button onClick={() => setVideoStarted(true)} className="zazi-tap w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl relative z-10">
+            <Play size={26} className="text-zazi-orange fill-zazi-orange ml-1" />
+          </button>
+        )}
+        {!(lesson.videoUrl && videoStarted) && (
+          <>
+            {/* Scrim keeps the title legible over any cover image */}
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+            <h1 className="absolute bottom-4 left-4 right-4 text-white font-extrabold text-xl leading-snug drop-shadow-sm z-10">
+              {lesson.title}
+            </h1>
+          </>
+        )}
       </div>
+      {lesson.videoUrl && videoStarted && (
+        <h1 className="px-6 pt-4 text-zazi-navy font-extrabold text-xl leading-snug">{lesson.title}</h1>
+      )}
 
       <div className="px-6 pt-5 flex-1">
         {topic && (
@@ -159,9 +179,16 @@ export default function LessonDetailScreen() {
               <p className="text-zazi-navy font-bold text-sm truncate">{lesson.resource.name}</p>
               <p className="text-zazi-navy/40 text-[11px]">{lesson.resource.type} · Lesson resource</p>
             </div>
-            <button onClick={() => setResourceOpen(v => !v)} className="text-zazi-teal text-xs font-bold flex-shrink-0">
-              {resourceOpen ? 'Hide' : 'View'}
-            </button>
+            {lesson.resource.fileUrl && (
+              <a href={lesson.resource.fileUrl} target="_blank" rel="noopener noreferrer" className="text-zazi-teal text-xs font-bold flex-shrink-0">
+                Download
+              </a>
+            )}
+            {lesson.resource.content && (
+              <button onClick={() => setResourceOpen(v => !v)} className="text-zazi-teal text-xs font-bold flex-shrink-0">
+                {resourceOpen ? 'Hide' : 'View'}
+              </button>
+            )}
           </div>
           {resourceOpen && lesson.resource.content && (
             <div className="mt-3.5 pt-3.5 border-t border-gray-100">
@@ -199,7 +226,7 @@ export default function LessonDetailScreen() {
             ))}
           </div>
           <div className="flex items-center gap-2">
-            <Avatar avatarId={user.avatarId} size="xs" />
+            <Avatar avatarId={user.avatarId} customization={user.avatarCustomization} size="xs" />
             <input
               value={comment}
               onChange={e => setComment(e.target.value)}
@@ -255,7 +282,10 @@ export default function LessonDetailScreen() {
                 size="sm"
                 className="mt-3"
                 disabled={Object.keys(quizAnswers).length < lessonQuiz.length}
-                onClick={() => setQuizSubmitted(true)}
+                onClick={() => {
+                  setQuizSubmitted(true)
+                  submitQuiz(lesson.id, quizScore, lessonQuiz.length)
+                }}
               >
                 Check Answers
               </Button>

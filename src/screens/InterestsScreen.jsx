@@ -28,7 +28,7 @@ export default function InterestsScreen() {
   const handleContinue = async () => {
     setSubmitting(true)
     await updateInterests(selected)
-    navigate('/home')
+    navigate('/create-avatar', { state: { mode: 'onboarding' } })
   }
 
   return (
@@ -38,7 +38,7 @@ export default function InterestsScreen() {
         <button onClick={() => navigate('/signup')} className="flex items-center gap-1 text-zazi-navy">
           <ChevronLeft size={20} />
         </button>
-        <button onClick={() => navigate('/home')} className="text-zazi-orange text-sm font-semibold">Skip</button>
+        <button onClick={() => navigate('/create-avatar', { state: { mode: 'onboarding' } })} className="text-zazi-orange text-sm font-semibold">Skip</button>
       </div>
 
       <div className="px-6">

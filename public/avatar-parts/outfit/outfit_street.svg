@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+    <path d="M40,200 L40,178 Q40,150 78,142 L86,152 Q100,160 114,152 L122,142 Q160,150 160,178 L160,200 Z" fill="#17283A"/>
+    <path d="M86,152 Q100,164 114,152 L110,176 Q100,182 90,176 Z" fill="#0d1b28"/>
+    <path d="M92,158 L90,196 M108,158 L110,196" stroke="#F4B84C" stroke-width="1.6" stroke-dasharray="2 3"/>
+  </svg>

@@ -12,6 +12,7 @@ import AuthScreen from './screens/AuthScreen'
 import LoginScreen from './screens/LoginScreen'
 import SignUpScreen from './screens/SignUpScreen'
 import InterestsScreen from './screens/InterestsScreen'
+import CreateAvatarScreen from './screens/CreateAvatarScreen'
 import HomeScreen from './screens/HomeScreen'
 import LearnScreen from './screens/LearnScreen'
 import LessonDetailScreen from './screens/LessonDetailScreen'
@@ -20,6 +21,8 @@ import ContentViewScreen from './screens/ContentViewScreen'
 import CareerHubScreen from './screens/CareerHubScreen'
 import CreateContentScreen from './screens/CreateContentScreen'
 import CreateSubmissionScreen from './screens/CreateSubmissionScreen'
+import ChallengesScreen from './screens/ChallengesScreen'
+import SearchScreen from './screens/SearchScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import NotificationsScreen from './screens/NotificationsScreen'
 import ContributorApplicationScreen from './screens/ContributorApplicationScreen'
@@ -42,6 +45,7 @@ export default function App() {
               <Route path="/login" element={<LoginScreen />} />
               <Route path="/signup" element={<SignUpScreen />} />
               <Route path="/interests" element={<InterestsScreen />} />
+              <Route path="/create-avatar" element={<CreateAvatarScreen />} />
             </Route>
 
             {/* Student app — sidebar on desktop, bottom tab bar on mobile. Requires a session. */}
@@ -53,6 +57,8 @@ export default function App() {
                 <Route path="/career" element={<CareerHubScreen />} />
                 <Route path="/create" element={<CreateContentScreen />} />
                 <Route path="/create/:type" element={<CreateSubmissionScreen />} />
+                <Route path="/challenges" element={<ChallengesScreen />} />
+                <Route path="/search" element={<SearchScreen />} />
                 <Route path="/explore" element={<ExploreScreen />} />
                 <Route path="/explore/:contentId" element={<ContentViewScreen />} />
                 <Route path="/profile" element={<ProfileScreen />} />

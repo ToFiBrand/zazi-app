@@ -16,7 +16,8 @@ export default function ExploreScreen() {
   const filtered = useMemo(() => {
     return publishedContributions.filter(c => {
       const inType = typeFilter === 'all' || c.type === typeFilter
-      const inQuery = !query || c.title.toLowerCase().includes(query.toLowerCase())
+      const q = query.toLowerCase()
+      const inQuery = !query || c.title.toLowerCase().includes(q) || (c.description || '').toLowerCase().includes(q) || (c.author || '').toLowerCase().includes(q)
       return inType && inQuery
     })
   }, [publishedContributions, typeFilter, query])
@@ -97,7 +98,7 @@ export default function ExploreScreen() {
                 </div>
               </div>
               <div className="mt-2.5 flex items-center gap-1.5">
-                <Avatar avatarId={item.avatarId} size="xs" />
+                <Avatar avatarId={item.avatarId} customization={item.avatarCustomization} size="xs" />
                 <p className="text-zazi-navy/50 text-[10px] truncate">{item.author}</p>
               </div>
               <p className="text-zazi-navy font-bold text-xs leading-tight mt-1">{item.title}</p>

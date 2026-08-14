@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronLeft, Heart, MessageCircle, Share2, SearchX, Sparkles } from 'lucide-react'
+import { ChevronLeft, Heart, MessageCircle, Share2, SearchX, Sparkles, Music } from 'lucide-react'
 import { CONTENT_TYPES } from '../data/content'
 import { PILLARS } from '../data/pillars'
 import { useApp } from '../context/AppContext'
@@ -42,12 +42,27 @@ export default function ContentViewScreen() {
     <div className="min-h-screen bg-zazi-cream flex flex-col">
       {/* Hero */}
       <div className="relative w-full flex items-center justify-center overflow-hidden" style={{ height: 220, background: item.color + '1C' }}>
-        {item.imageUrl && <img src={item.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />}
+        {item.videoUrl ? (
+          <video src={item.videoUrl} controls playsInline poster={item.imageUrl || item.thumbnailUrl || undefined} className="absolute inset-0 w-full h-full object-cover" />
+        ) : item.imageUrl ? (
+          <img src={item.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          typeInfo ? <typeInfo.icon size={56} style={{ color: item.color }} /> : <Sparkles size={56} className="text-zazi-navy/30" />
+        )}
         <button onClick={() => navigate('/explore')} className="absolute top-4 left-4 w-9 h-9 bg-black/20 backdrop-blur rounded-full flex items-center justify-center z-10">
           <ChevronLeft size={18} className="text-white" />
         </button>
-        {!item.imageUrl && (typeInfo ? <typeInfo.icon size={56} style={{ color: item.color }} /> : <Sparkles size={56} className="text-zazi-navy/30" />)}
       </div>
+
+      {/* Audio player — podcasts have no visual hero, so this is their media */}
+      {item.audioUrl && (
+        <div className="mx-6 mt-4 bg-white rounded-2xl p-4 shadow-soft flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: item.color + '1C' }}>
+            <Music size={18} style={{ color: item.color }} />
+          </div>
+          <audio src={item.audioUrl} controls className="flex-1 min-w-0 h-9" />
+        </div>
+      )}
 
       {/* Content */}
       <div className="px-6 pt-5 flex-1">
@@ -59,7 +74,7 @@ export default function ContentViewScreen() {
 
         {/* Author */}
         <div className="flex items-center gap-2.5 mt-4">
-          <Avatar avatarId={item.avatarId} size="sm" />
+          <Avatar avatarId={item.avatarId} customization={item.avatarCustomization} size="sm" />
           <div>
             <p className="text-zazi-navy font-bold text-sm">{item.author}</p>
             <p className="text-zazi-navy/45 text-[11px]">{item.school}</p>
@@ -109,7 +124,7 @@ export default function ContentViewScreen() {
 
       {/* Comment input */}
       <div className="sticky bottom-0 bg-white border-t border-zazi-navy/8 px-4 py-3 flex items-center gap-2">
-        <Avatar avatarId={user.avatarId} size="xs" />
+        <Avatar avatarId={user.avatarId} customization={user.avatarCustomization} size="xs" />
         <input
           className="flex-1 bg-zazi-input-bg rounded-full px-4 py-2.5 text-sm text-zazi-navy placeholder-zazi-navy/40 outline-none"
           placeholder="Add a comment... (moderated)"

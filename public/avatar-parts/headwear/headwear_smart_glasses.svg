@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+    <path d="M68,70 Q100,60 132,70 L132,80 Q100,72 68,80 Z" fill="#0d1b28" opacity="0.92"/>
+    <path d="M68,70 Q100,60 132,70" stroke="#4de8d8" stroke-width="1.6" fill="none" opacity="0.9"/>
+    <circle cx="83" cy="75" r="2" fill="#4de8d8"/>
+    <path d="M66,72 L56,68" stroke="#0d1b28" stroke-width="2.6"/>
+    <path d="M134,72 L144,68" stroke="#0d1b28" stroke-width="2.6"/>
+  </svg>

@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Bell, Play, ChevronRight, Trophy, Clock, Rocket, Cpu } from 'lucide-react'
+import { Search, Bell, Play, ChevronRight, Trophy, Clock, Rocket, Cpu, Flame, Target } from 'lucide-react'
 import { PILLARS, pillarById } from '../data/pillars'
+import { avatarLevelForXp, nextAvatarLevel, avatarLevelProgress } from '../data/avatarLevels'
 import { useApp } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
 import { Avatar, Card, Chip, ProgressBar } from '../components/ui'
@@ -16,9 +17,14 @@ const FEATURED_PILLARS = [
 
 export default function HomeScreen() {
   const navigate = useNavigate()
-  const { user, publishedLessons, progress, studentContributions, notifications, continueLesson, recommendedLessons, lessonProgressPct } = useApp()
+  const { user, publishedLessons, progress, studentContributions, notifications, continueLesson, recommendedLessons, lessonProgressPct, todaysMission, myTodaysMissionProgress } = useApp()
   const { isGuest } = useAuth()
   const unread = notifications.filter(n => !n.read).length
+
+  const level = avatarLevelForXp(user.points || 0)
+  const next = nextAvatarLevel(user.points || 0)
+  const levelPct = Math.round(avatarLevelProgress(user.points || 0) * 100)
+  const missionDone = myTodaysMissionProgress?.status === 'completed'
 
   const featured = useMemo(() => {
     return continueLesson || publishedLessons.filter(l => user.grade >= l.gradeMin && user.grade <= l.gradeMax)[0]
@@ -56,24 +62,64 @@ export default function HomeScreen() {
               )}
             </button>
             <button onClick={() => navigate('/profile')}>
-              <Avatar avatarId={user.avatarId} size="sm" />
+              <Avatar avatarId={user.avatarId} customization={user.avatarCustomization} size="sm" />
             </button>
           </div>
         </div>
 
         <div className="absolute bottom-5 left-6 right-6 z-10">
-          <p className="text-white/85 text-sm mb-1 drop-shadow-sm">Hi, {user.firstName} 👋</p>
+          <div className="flex items-center gap-2 mb-1">
+            <Avatar avatarId={user.avatarId} customization={user.avatarCustomization} size="xs" />
+            <p className="text-white/85 text-sm drop-shadow-sm">Hi, {user.firstName} 👋</p>
+          </div>
           <h1 className="text-white text-2xl font-extrabold leading-tight drop-shadow-sm">Ready to build your future?</h1>
         </div>
       </div>
 
       {/* Search */}
       <div className="px-6 mt-4">
-        <button onClick={() => navigate('/learn')} className="w-full bg-white rounded-2xl flex items-center gap-2.5 px-4 py-3.5 shadow-soft">
+        <button onClick={() => navigate('/search')} className="w-full bg-white rounded-2xl flex items-center gap-2.5 px-4 py-3.5 shadow-soft">
           <Search size={17} className="text-zazi-navy/40" />
-          <span className="text-zazi-navy/40 text-sm">Search for lessons, topics...</span>
+          <span className="text-zazi-navy/40 text-sm">Search lessons, stories, pillars...</span>
         </button>
       </div>
+
+      {/* XP + streak — compact by design, learning content stays the star */}
+      <div className="px-6 mt-4">
+        <button onClick={() => navigate('/profile')} className="zazi-tap w-full bg-white rounded-2xl px-4 py-3.5 shadow-soft text-left">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-zazi-navy font-extrabold text-xs">Level {level.level} · {level.name}</span>
+            {user.currentStreak > 0 ? (
+              <span className="flex items-center gap-1 text-zazi-coral text-xs font-bold">
+                <Flame size={12} className="fill-zazi-coral" /> {user.currentStreak} day streak
+              </span>
+            ) : (
+              <span className="text-zazi-navy/40 text-xs">{next ? `${next.minXp - (user.points || 0)} XP to ${next.name}` : 'Max level'}</span>
+            )}
+          </div>
+          <ProgressBar pct={levelPct} color="#FF8A00" height={6} />
+        </button>
+      </div>
+
+      {/* Today's Mission */}
+      {todaysMission && (
+        <div className="px-6 mt-4">
+          <button onClick={() => navigate('/challenges')} className="zazi-tap w-full bg-zazi-navy rounded-2xl px-4 py-4 flex items-center gap-3 text-left">
+            <div className="w-9 h-9 bg-zazi-orange/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <Target size={16} className="text-zazi-orange" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-zazi-gold text-[10px] font-bold uppercase tracking-wide">Today's Mission</p>
+              <p className="text-white text-sm font-bold truncate">{todaysMission.title}</p>
+            </div>
+            {missionDone ? (
+              <span className="text-zazi-teal text-xs font-bold flex-shrink-0">Done ✓</span>
+            ) : (
+              <span className="text-zazi-gold text-xs font-bold flex-shrink-0">+{todaysMission.xpReward} XP</span>
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Guest banner */}
       {isGuest && (
@@ -222,7 +268,7 @@ export default function HomeScreen() {
           <div className="space-y-3">
             {trending.map(c => (
               <Card key={c.id} interactive onClick={() => navigate(`/explore/${c.id}`)} className="w-full p-3 flex gap-3 items-center text-left">
-                <Avatar avatarId={c.avatarId} size="md" />
+                <Avatar avatarId={c.avatarId} customization={c.avatarCustomization} size="md" />
                 <div className="flex-1 min-w-0">
                   <p className="text-zazi-navy font-bold text-sm truncate">{c.title}</p>
                   <p className="text-zazi-navy/50 text-xs mt-0.5 truncate">{c.author} · {c.school}</p>

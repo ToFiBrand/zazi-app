@@ -1,29 +1,78 @@
-import { useState, useEffect } from 'react'
-import { Users, FileText, School, BarChart2, CheckCircle, XCircle, RotateCcw, LogOut, GraduationCap, Layers, Plus, ChevronDown } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import { Users, FileText, School, BarChart2, CheckCircle, XCircle, RotateCcw, LogOut, GraduationCap, Layers, Plus, ChevronDown, Target, BookOpen, Pencil, Search } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { PILLARS } from '../data/pillars'
 import { CONTENT_TYPES } from '../data/content'
+import { DIFFICULTY_LABEL } from '../data/xpValues'
+import LessonEditor from '../components/admin/LessonEditor'
+import AnalyticsDashboard from '../components/admin/AnalyticsDashboard'
 
 const NAV = [
   { id: 'analytics', label: 'Analytics', icon: BarChart2 },
   { id: 'moderation',label: 'Moderation', icon: FileText },
+  { id: 'lessons',   label: 'Lessons',   icon: BookOpen },
   { id: 'topics',    label: 'Topics',    icon: Layers },
+  { id: 'challenges', label: 'Challenges', icon: Target },
   { id: 'schools',   label: 'Schools',   icon: School },
 ]
 
+const CHALLENGE_TYPES = ['knowledge', 'practical', 'creator', 'community']
+
+const NEW_CHALLENGE_DEFAULT = { title: '', description: '', pillar: PILLARS[0].id, challengeType: 'practical', difficulty: 1, xpReward: 50 }
+
+const LESSON_STATUS_STYLE = {
+  published: { bg: '#dcfce7', text: '#16a34a', label: 'Published' },
+  draft:     { bg: '#e5e7eb', text: '#4b5563', label: 'Draft' },
+  pending:   { bg: '#fde8e8', text: '#dc2626', label: 'Pending' },
+  rejected:  { bg: '#f3f4f6', text: '#6b7280', label: 'Rejected' },
+}
+
 export default function AdminDashboard() {
   const {
-    publishedLessons, pendingLessons, decideLesson,
+    lessons, publishedLessons, pendingLessons, decideLesson, addLesson, updateLesson, deleteLesson,
+    quizQuestions, saveLessonQuiz,
     contributions, pendingContributions, decideContribution,
     topics, addTopic,
+    challenges, addChallenge,
   } = useApp()
   const { signOut } = useAuth()
   const [activeNav, setActiveNav] = useState('analytics')
   const [schools, setSchools] = useState([])
   const [newTopic, setNewTopic] = useState({ pillar: PILLARS[0].id, name: '', description: '' })
   const [addingTopic, setAddingTopic] = useState(false)
+  const [newChallenge, setNewChallenge] = useState(NEW_CHALLENGE_DEFAULT)
+  const [addingChallenge, setAddingChallenge] = useState(false)
+  const [lessonQuery, setLessonQuery] = useState('')
+  const [lessonStatusFilter, setLessonStatusFilter] = useState('all')
+  const [editingLesson, setEditingLesson] = useState(null) // null = closed, {} = new, lesson object = edit
+  const [savingLesson, setSavingLesson] = useState(false)
+
+  const filteredLessons = useMemo(() => {
+    return lessons.filter(l => {
+      const inStatus = lessonStatusFilter === 'all' || l.status === lessonStatusFilter
+      const inQuery = !lessonQuery || l.title.toLowerCase().includes(lessonQuery.toLowerCase())
+      return inStatus && inQuery
+    }).sort((a, b) => new Date(b.publishedAt || b.createdAt || 0) - new Date(a.publishedAt || a.createdAt || 0))
+  }, [lessons, lessonQuery, lessonStatusFilter])
+
+  const handleSaveLesson = async (payload, status, questions) => {
+    setSavingLesson(true)
+    const isNew = !editingLesson?.id
+    const saved = isNew
+      ? await addLesson({ ...payload, status })
+      : await updateLesson(editingLesson.id, { ...payload, status })
+    if (saved) await saveLessonQuiz(saved.id, questions)
+    setSavingLesson(false)
+    setEditingLesson(null)
+  }
+
+  const handleDeleteLesson = async (id) => {
+    if (!window.confirm('Delete this lesson permanently? This cannot be undone.')) return
+    await deleteLesson(id)
+    setEditingLesson(null)
+  }
 
   useEffect(() => {
     supabase.from('schools').select('*').order('name').then(({ data }) => setSchools(data || []))
@@ -37,16 +86,18 @@ export default function AdminDashboard() {
     setNewTopic({ pillar: newTopic.pillar, name: '', description: '' })
   }
 
+  const handleAddChallenge = async () => {
+    if (!newChallenge.title.trim() || !newChallenge.description.trim()) return
+    setAddingChallenge(true)
+    await addChallenge({ ...newChallenge, title: newChallenge.title.trim(), description: newChallenge.description.trim() })
+    setAddingChallenge(false)
+    setNewChallenge({ ...NEW_CHALLENGE_DEFAULT, pillar: newChallenge.pillar })
+  }
+
   const pendingStudentContributions = pendingContributions.filter(c => c.contributorRole === 'student')
   const pendingTeacherContributions = pendingContributions.filter(c => c.contributorRole === 'teacher')
   const totalPending = pendingContributions.length + pendingLessons.length
   const publishedContributions = contributions.filter(c => c.status === 'published')
-
-  const CAT_DATA = PILLARS.map(p => {
-    const count = publishedContributions.filter(c => c.pillar === p.id).length + publishedLessons.filter(l => l.pillar === p.id).length
-    return { label: p.short, color: p.color, count }
-  })
-  const maxCat = Math.max(1, ...CAT_DATA.map(c => c.count))
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -85,46 +136,12 @@ export default function AdminDashboard() {
       {/* Main */}
       <main className="flex-1 overflow-y-auto p-6 no-scrollbar">
         {activeNav === 'analytics' && (
-          <>
-            <div className="mb-6">
-              <h1 className="text-xl font-black text-zazi-navy">Analytics Dashboard</h1>
-              <p className="text-zazi-muted text-sm">Platform overview and insights</p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              {[
-                { label: 'Total Lessons',      val: publishedLessons.length, icon: GraduationCap, color: '#006E68' },
-                { label: 'Contributions',      val: publishedContributions.length, icon: FileText, color: '#FF8A00' },
-                { label: 'Pending Moderation', val: totalPending,            icon: Users,          color: '#0D665F' },
-                { label: 'Schools',            val: schools.length,          icon: School,         color: '#F4B84C' },
-              ].map(k => (
-                <div key={k.label} className="bg-white rounded-2xl p-4 shadow-card">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: k.color + '20' }}>
-                    <k.icon size={18} style={{ color: k.color }} />
-                  </div>
-                  <p className="text-2xl font-black text-zazi-navy">{k.val}</p>
-                  <p className="text-zazi-muted text-xs mt-0.5">{k.label}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 shadow-card">
-              <h3 className="font-black text-zazi-navy text-sm mb-4">Content & Lessons by Pillar</h3>
-              <div className="space-y-3">
-                {CAT_DATA.map(c => (
-                  <div key={c.label}>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-zazi-navy text-xs font-medium">{c.label}</span>
-                      <span className="text-xs font-bold" style={{ color: c.color }}>{c.count}</span>
-                    </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${(c.count / maxCat) * 100}%`, background: c.color }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
+          <AnalyticsDashboard
+            publishedLessons={publishedLessons}
+            publishedContributions={publishedContributions}
+            schools={schools}
+            totalPending={totalPending}
+          />
         )}
 
         {activeNav === 'moderation' && (
@@ -203,6 +220,77 @@ export default function AdminDashboard() {
           </>
         )}
 
+        {activeNav === 'lessons' && (
+          <>
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h1 className="text-xl font-black text-zazi-navy">Lessons</h1>
+                <p className="text-zazi-muted text-sm">Every lesson on the platform — author and publish directly, or review what teachers have submitted</p>
+              </div>
+              <button
+                onClick={() => setEditingLesson({})}
+                className="flex items-center justify-center gap-2 bg-zazi-orange text-white font-bold text-sm px-4 py-2.5 rounded-xl whitespace-nowrap self-start"
+              >
+                <Plus size={16} /> Create Lesson
+              </button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              <div className="relative flex-1">
+                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zazi-muted" />
+                <input
+                  value={lessonQuery}
+                  onChange={e => setLessonQuery(e.target.value)}
+                  placeholder="Search lessons by title..."
+                  className="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none"
+                />
+              </div>
+              <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+                {['all', 'published', 'draft', 'pending', 'rejected'].map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setLessonStatusFilter(s)}
+                    className={`flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold capitalize ${lessonStatusFilter === s ? 'bg-zazi-navy text-white' : 'bg-white text-zazi-muted border border-gray-200'}`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-card overflow-hidden">
+              {filteredLessons.length === 0 ? (
+                <p className="text-zazi-muted text-sm text-center py-10">No lessons match this filter.</p>
+              ) : (
+                filteredLessons.map((lesson, i) => {
+                  const st = LESSON_STATUS_STYLE[lesson.status] || LESSON_STATUS_STYLE.draft
+                  const pillar = PILLARS.find(p => p.id === lesson.pillar)
+                  return (
+                    <button
+                      key={lesson.id}
+                      onClick={() => setEditingLesson(lesson)}
+                      className={`w-full flex items-center gap-3 px-5 py-3.5 text-left hover:bg-gray-50 ${i !== filteredLessons.length - 1 ? 'border-b border-gray-100' : ''}`}
+                    >
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" style={{ background: (pillar?.color || '#FF8A00') + '20' }}>
+                        {lesson.coverImageUrl ? <img src={lesson.coverImageUrl} alt="" className="w-full h-full object-cover" /> : pillar && <pillar.icon size={18} style={{ color: pillar.color }} />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-zazi-navy font-bold text-sm truncate">{lesson.title}</p>
+                        <p className="text-zazi-muted text-[11px] mt-0.5">{pillar?.short} · Gr {lesson.gradeMin}-{lesson.gradeMax} · {lesson.contributor}</p>
+                      </div>
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <span className="text-zazi-muted text-xs hidden sm:flex items-center gap-1"><Users size={11} /> {lesson.views}</span>
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: st.bg, color: st.text }}>{st.label}</span>
+                        <Pencil size={13} className="text-zazi-muted" />
+                      </div>
+                    </button>
+                  )
+                })
+              )}
+            </div>
+          </>
+        )}
+
         {activeNav === 'topics' && (
           <>
             <div className="mb-6">
@@ -273,6 +361,103 @@ export default function AdminDashboard() {
           </>
         )}
 
+        {activeNav === 'challenges' && (
+          <>
+            <div className="mb-6">
+              <h1 className="text-xl font-black text-zazi-navy">Challenges</h1>
+              <p className="text-zazi-muted text-sm">Structured challenges learners can start and complete — knowledge checks, practical tasks, creator prompts and community activities</p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 shadow-card mb-5">
+              <h3 className="font-black text-zazi-navy text-sm mb-4">Add a Challenge</h3>
+              <div className="grid md:grid-cols-2 gap-3">
+                <input
+                  value={newChallenge.title}
+                  onChange={e => setNewChallenge(c => ({ ...c, title: e.target.value }))}
+                  placeholder="Challenge title"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none"
+                />
+                <input
+                  value={newChallenge.description}
+                  onChange={e => setNewChallenge(c => ({ ...c, description: e.target.value }))}
+                  placeholder="Short description"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none"
+                />
+                <div className="relative">
+                  <select
+                    value={newChallenge.pillar}
+                    onChange={e => setNewChallenge(c => ({ ...c, pillar: e.target.value }))}
+                    className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none"
+                  >
+                    {PILLARS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-zazi-muted pointer-events-none" />
+                </div>
+                <div className="relative">
+                  <select
+                    value={newChallenge.challengeType}
+                    onChange={e => setNewChallenge(c => ({ ...c, challengeType: e.target.value }))}
+                    className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none capitalize"
+                  >
+                    {CHALLENGE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-zazi-muted pointer-events-none" />
+                </div>
+                <div className="relative">
+                  <select
+                    value={newChallenge.difficulty}
+                    onChange={e => setNewChallenge(c => ({ ...c, difficulty: Number(e.target.value) }))}
+                    className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-3 py-3 text-sm outline-none"
+                  >
+                    {[1, 2, 3].map(d => <option key={d} value={d}>{DIFFICULTY_LABEL[d]}</option>)}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-zazi-muted pointer-events-none" />
+                </div>
+                <input
+                  type="number"
+                  min={0}
+                  value={newChallenge.xpReward}
+                  onChange={e => setNewChallenge(c => ({ ...c, xpReward: Number(e.target.value) }))}
+                  placeholder="XP reward"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none"
+                />
+              </div>
+              <button
+                onClick={handleAddChallenge}
+                disabled={!newChallenge.title.trim() || !newChallenge.description.trim() || addingChallenge}
+                className="mt-3 flex items-center gap-2 bg-zazi-orange text-white font-bold text-sm px-4 py-2.5 rounded-xl disabled:opacity-40 disabled:pointer-events-none"
+              >
+                <Plus size={16} />
+                {addingChallenge ? 'Adding...' : 'Add Challenge'}
+              </button>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 shadow-card">
+              <h3 className="font-black text-zazi-navy text-sm mb-4">All Challenges ({challenges.length})</h3>
+              {challenges.length === 0 ? (
+                <p className="text-zazi-muted text-xs">No challenges yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {challenges.map(c => {
+                    const pillar = PILLARS.find(p => p.id === c.pillar)
+                    return (
+                      <div key={c.id} className="flex items-center gap-3 px-3 py-2.5 bg-gray-50 rounded-xl">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: (pillar?.color || '#FF8A00') + '20' }}>
+                          <Target size={14} style={{ color: pillar?.color || '#FF8A00' }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-zazi-navy font-bold text-sm truncate">{c.title}</p>
+                          <p className="text-zazi-muted text-[11px] capitalize">{c.type} · {DIFFICULTY_LABEL[c.difficulty]} · +{c.xpReward} XP</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
         {activeNav === 'schools' && (
           <>
             <div className="mb-6">
@@ -293,6 +478,17 @@ export default function AdminDashboard() {
           </>
         )}
       </main>
+
+      {editingLesson && (
+        <LessonEditor
+          lesson={editingLesson.id ? editingLesson : null}
+          topics={topics}
+          existingQuestions={editingLesson.id ? quizQuestions.filter(q => q.lessonId === editingLesson.id) : []}
+          onSave={handleSaveLesson}
+          onDelete={handleDeleteLesson}
+          onCancel={() => !savingLesson && setEditingLesson(null)}
+        />
+      )}
     </div>
   )
 }
