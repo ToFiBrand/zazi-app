@@ -168,12 +168,33 @@ export default function ProfileScreen() {
           <ChevronRight size={16} className="text-zazi-navy/30 flex-shrink-0" />
         </button>
 
-        <button
-          onClick={() => navigate('/contributor-application')}
-          className="w-full mt-3 border-2 border-zazi-teal/25 text-zazi-teal font-bold text-xs py-3 rounded-2xl"
-        >
-          Become a Zazi Contributor →
-        </button>
+        {user.verificationStatus === 'pending' && (
+          <div className="w-full mt-3 bg-zazi-gold/10 border border-zazi-gold/25 text-center py-3 rounded-2xl">
+            <p className="text-zazi-navy font-bold text-xs">Contributor application under review</p>
+            <p className="text-zazi-navy/50 text-[11px] mt-0.5">We'll let you know once it's been reviewed</p>
+          </div>
+        )}
+        {user.verificationStatus === 'approved' && (
+          <div className="w-full mt-3 bg-zazi-teal/10 border border-zazi-teal/25 text-center py-3 rounded-2xl">
+            <p className="text-zazi-teal font-bold text-xs">✓ Verified Zazi Contributor</p>
+          </div>
+        )}
+        {user.verificationStatus === 'rejected' && (
+          <button
+            onClick={() => navigate('/contributor-application')}
+            className="w-full mt-3 border-2 border-zazi-navy/15 text-zazi-navy/60 font-bold text-xs py-3 rounded-2xl"
+          >
+            Application not approved — Reapply →
+          </button>
+        )}
+        {(!user.verificationStatus || user.verificationStatus === 'none') && (
+          <button
+            onClick={() => navigate('/contributor-application')}
+            className="w-full mt-3 border-2 border-zazi-teal/25 text-zazi-teal font-bold text-xs py-3 rounded-2xl"
+          >
+            Become a Zazi Contributor →
+          </button>
+        )}
       </div>
 
       {/* Category mastery — "where am I growing?" */}

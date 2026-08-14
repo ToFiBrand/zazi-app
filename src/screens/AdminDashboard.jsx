@@ -12,11 +12,18 @@ import AnalyticsDashboard from '../components/admin/AnalyticsDashboard'
 const NAV = [
   { id: 'analytics', label: 'Analytics', icon: BarChart2 },
   { id: 'moderation',label: 'Moderation', icon: FileText },
+  { id: 'applications', label: 'Educators', icon: GraduationCap },
   { id: 'lessons',   label: 'Lessons',   icon: BookOpen },
   { id: 'topics',    label: 'Topics',    icon: Layers },
   { id: 'challenges', label: 'Challenges', icon: Target },
   { id: 'schools',   label: 'Schools',   icon: School },
 ]
+
+const APPLICATION_STATUS_STYLE = {
+  pending:  { bg: '#fde8e8', text: '#dc2626' },
+  approved: { bg: '#dcfce7', text: '#16a34a' },
+  rejected: { bg: '#f3f4f6', text: '#6b7280' },
+}
 
 const CHALLENGE_TYPES = ['knowledge', 'practical', 'creator', 'community']
 
@@ -37,9 +44,11 @@ export default function AdminDashboard() {
     topics, addTopic,
     challenges, addChallenge,
   } = useApp()
-  const { signOut } = useAuth()
+  const { signOut, profile } = useAuth()
   const [activeNav, setActiveNav] = useState('analytics')
   const [schools, setSchools] = useState([])
+  const [applications, setApplications] = useState([])
+  const [applicationStatusFilter, setApplicationStatusFilter] = useState('pending')
   const [newTopic, setNewTopic] = useState({ pillar: PILLARS[0].id, name: '', description: '' })
   const [addingTopic, setAddingTopic] = useState(false)
   const [newChallenge, setNewChallenge] = useState(NEW_CHALLENGE_DEFAULT)
@@ -76,7 +85,20 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     supabase.from('schools').select('*').order('name').then(({ data }) => setSchools(data || []))
+    supabase.from('teacher_applications').select('*').order('created_at', { ascending: false })
+      .then(({ data }) => setApplications(data || []))
   }, [])
+
+  const handleDecideApplication = async (id, status) => {
+    const { error } = await supabase.from('teacher_applications').update({ status }).eq('id', id)
+    if (error) { console.error('decideApplication failed:', error.message); return }
+    setApplications(prev => prev.map(a => a.id === id ? { ...a, status } : a))
+    await supabase.from('moderation_log').insert({ moderator_id: profile.id, content_type: 'application', content_id: id, decision: status })
+  }
+
+  const filteredApplications = useMemo(() => {
+    return applicationStatusFilter === 'all' ? applications : applications.filter(a => a.status === applicationStatusFilter)
+  }, [applications, applicationStatusFilter])
 
   const handleAddTopic = async () => {
     if (!newTopic.name.trim()) return
@@ -97,6 +119,7 @@ export default function AdminDashboard() {
   const pendingStudentContributions = pendingContributions.filter(c => c.contributorRole === 'student')
   const pendingTeacherContributions = pendingContributions.filter(c => c.contributorRole === 'teacher')
   const totalPending = pendingContributions.length + pendingLessons.length
+  const pendingApplications = applications.filter(a => a.status === 'pending')
   const publishedContributions = contributions.filter(c => c.status === 'published')
 
   return (
@@ -122,6 +145,9 @@ export default function AdminDashboard() {
               <span className="hidden md:block">{label}</span>
               {id === 'moderation' && totalPending > 0 && (
                 <span className="hidden md:flex ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 items-center justify-center">{totalPending}</span>
+              )}
+              {id === 'applications' && pendingApplications.length > 0 && (
+                <span className="hidden md:flex ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 items-center justify-center">{pendingApplications.length}</span>
               )}
             </button>
           ))}
@@ -213,6 +239,39 @@ export default function AdminDashboard() {
                         </button>
                       </div>
                     </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {activeNav === 'applications' && (
+          <>
+            <div className="mb-6">
+              <h1 className="text-xl font-black text-zazi-navy">Educator Applications</h1>
+              <p className="text-zazi-muted text-sm">Review people applying to contribute as educators or mentors — approving flips their role to teacher</p>
+            </div>
+
+            <div className="flex gap-1.5 overflow-x-auto no-scrollbar mb-4">
+              {['pending', 'approved', 'rejected', 'all'].map(s => (
+                <button
+                  key={s}
+                  onClick={() => setApplicationStatusFilter(s)}
+                  className={`flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold capitalize ${applicationStatusFilter === s ? 'bg-zazi-navy text-white' : 'bg-white text-zazi-muted border border-gray-200'}`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 shadow-card">
+              {filteredApplications.length === 0 ? (
+                <EmptyQueue label="No applications match this filter." />
+              ) : (
+                <div className="space-y-3">
+                  {filteredApplications.map(app => (
+                    <ApplicationRow key={app.id} app={app} onDecide={handleDecideApplication} />
                   ))}
                 </div>
               )}
@@ -498,6 +557,38 @@ function EmptyQueue({ label = 'All caught up! No submissions pending.' }) {
     <div className="text-center py-8 text-zazi-muted text-sm">
       <CheckCircle size={32} className="text-green-500 mx-auto mb-2" />
       {label}
+    </div>
+  )
+}
+
+function ApplicationRow({ app, onDecide }) {
+  const pillar = PILLARS.find(p => p.id === app.pillar)
+  const st = APPLICATION_STATUS_STYLE[app.status] || APPLICATION_STATUS_STYLE.pending
+  return (
+    <div className="p-4 bg-gray-50 rounded-xl">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-zazi-navy font-bold text-sm">{app.full_name}</p>
+          <p className="text-zazi-muted text-xs mt-0.5">{app.professional_role}{app.organisation ? ` · ${app.organisation}` : ''}</p>
+          {pillar && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1.5" style={{ background: pillar.color + '20', color: pillar.color }}>
+              <pillar.icon size={10} /> {pillar.name}
+            </span>
+          )}
+        </div>
+        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0 capitalize" style={{ background: st.bg, color: st.text }}>{app.status}</span>
+      </div>
+      <p className="text-zazi-navy/70 text-xs mt-2.5 leading-relaxed">{app.qualifications}</p>
+      {app.status === 'pending' && (
+        <div className="flex items-center gap-2 mt-3">
+          <button onClick={() => onDecide(app.id, 'approved')} className="flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl">
+            <CheckCircle size={14} /> Approve
+          </button>
+          <button onClick={() => onDecide(app.id, 'rejected')} className="flex items-center gap-1.5 border-2 border-red-400 text-red-500 text-xs font-bold px-3.5 py-2 rounded-xl">
+            <XCircle size={14} /> Reject
+          </button>
+        </div>
+      )}
     </div>
   )
 }

@@ -31,6 +31,7 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [loadProfile])
 
+  // grade/schoolId are optional — an educator signup has neither.
   const signUp = useCallback(async ({ email, password, firstName, lastName, grade, schoolId }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -39,9 +40,8 @@ export function AuthProvider({ children }) {
         data: {
           first_name: firstName,
           last_name: lastName,
-          role: 'student',
-          grade: String(grade),
-          school_id: schoolId,
+          grade: grade ? String(grade) : '',
+          school_id: schoolId || '',
         },
       },
     })
