@@ -36,7 +36,7 @@ export default function AvatarRenderer({ customization, size = 'md', ring = fals
       } ${className}`}
     >
       {layers.map(l => (
-        <img key={l.key} src={l.asset} alt="" className="absolute inset-0 w-full h-full" />
+        <img key={l.key} src={l.asset} alt="" className="absolute inset-0 w-full h-full object-cover" />
       ))}
     </div>
   )

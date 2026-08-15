@@ -11,7 +11,7 @@ export default function CreateContentScreen() {
   return (
     <div className="min-h-screen bg-zazi-cream pb-8">
       {/* Hero — hook question this screen answers */}
-      <div className="relative w-full overflow-hidden" style={{ height: 400 }}>
+      <div className="relative w-full overflow-hidden h-[300px] sm:h-[360px] md:h-[400px]">
         <video
           src="/video/create.mp4"
           autoPlay

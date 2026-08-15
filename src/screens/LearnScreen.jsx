@@ -46,7 +46,7 @@ export default function LearnScreen() {
   return (
     <div className="min-h-screen bg-zazi-cream flex flex-col pb-[76px] md:pb-10">
       {/* Hero — hook question this screen answers */}
-      <div className="relative w-full overflow-hidden" style={{ height: 400 }}>
+      <div className="relative w-full overflow-hidden h-[300px] sm:h-[360px] md:h-[400px]">
         <video
           src="/video/learn.mp4"
           autoPlay

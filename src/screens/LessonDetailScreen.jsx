@@ -61,11 +61,11 @@ export default function LessonDetailScreen() {
     <div className="min-h-screen bg-zazi-cream flex flex-col">
       {/* Hero */}
       <div
-        className="relative w-full flex items-center justify-center flex-shrink-0 overflow-hidden"
-        style={{ height: 220, background: `linear-gradient(135deg, ${lesson.color}, ${pillar?.color || lesson.color})` }}
+        className={`relative w-full flex items-center justify-center flex-shrink-0 overflow-hidden ${lesson.videoUrl && videoStarted ? 'aspect-video bg-black' : ''}`}
+        style={lesson.videoUrl && videoStarted ? undefined : { height: 220, background: `linear-gradient(135deg, ${lesson.color}, ${pillar?.color || lesson.color})` }}
       >
         {lesson.videoUrl && videoStarted ? (
-          <video src={lesson.videoUrl} controls autoPlay playsInline poster={lesson.coverImageUrl || undefined} className="absolute inset-0 w-full h-full object-cover" />
+          <video src={lesson.videoUrl} controls autoPlay playsInline poster={lesson.coverImageUrl || undefined} className="absolute inset-0 w-full h-full object-contain" />
         ) : (
           <>
             {lesson.coverImageUrl && (

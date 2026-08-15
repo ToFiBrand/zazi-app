@@ -41,9 +41,12 @@ export default function ContentViewScreen() {
   return (
     <div className="min-h-screen bg-zazi-cream flex flex-col">
       {/* Hero */}
-      <div className="relative w-full flex items-center justify-center overflow-hidden" style={{ height: 220, background: item.color + '1C' }}>
+      <div
+        className={`relative w-full flex items-center justify-center overflow-hidden ${item.videoUrl ? 'aspect-video bg-black' : ''}`}
+        style={item.videoUrl ? undefined : { height: 220, background: item.color + '1C' }}
+      >
         {item.videoUrl ? (
-          <video src={item.videoUrl} controls playsInline poster={item.imageUrl || item.thumbnailUrl || undefined} className="absolute inset-0 w-full h-full object-cover" />
+          <video src={item.videoUrl} controls playsInline poster={item.imageUrl || item.thumbnailUrl || undefined} className="absolute inset-0 w-full h-full object-contain" />
         ) : item.imageUrl ? (
           <img src={item.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
         ) : (
