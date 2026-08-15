@@ -9,7 +9,7 @@ export default function SplashScreen() {
       tabIndex={0}
       onClick={() => navigate('/onboarding')}
       onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') navigate('/onboarding') }}
-      className="min-h-screen w-full md:max-w-[480px] md:mx-auto flex flex-col items-center pt-16 relative overflow-hidden bg-zazi-navy cursor-pointer"
+      className="min-h-screen w-full flex flex-col items-center pt-16 relative overflow-hidden bg-zazi-navy cursor-pointer"
     >
       <video
         src="/video/app-opening.mp4"

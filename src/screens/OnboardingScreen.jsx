@@ -39,7 +39,7 @@ export default function OnboardingScreen() {
   const isLast = slide === SLIDES.length - 1
 
   return (
-    <div className="min-h-screen w-full md:max-w-[480px] md:mx-auto flex flex-col bg-zazi-navy">
+    <div className="min-h-screen w-full flex flex-col bg-zazi-navy">
       {/* Image — most of the screen */}
       <div className="relative w-full flex-1 min-h-0 overflow-hidden" key={slide}>
         <video
