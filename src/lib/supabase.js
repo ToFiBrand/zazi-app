@@ -7,4 +7,4 @@ if (!url || !key) {
   throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY — check .env.local')
 }
 
-export const supabase = createClient(url, key)
+export const supabase = createClient(url, key, { db: { schema: 'zazi' } })

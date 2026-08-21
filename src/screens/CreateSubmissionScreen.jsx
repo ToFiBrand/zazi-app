@@ -111,7 +111,7 @@ export default function CreateSubmissionScreen() {
             {mediaKind === 'video' ? 'Video' : mediaKind === 'audio' ? 'Audio' : 'Cover Image (optional)'}
           </label>
           <FileUpload
-            bucket="contribution-media"
+            bucket="zazi-contribution-media"
             folder={profile?.id}
             kind={mediaKind}
             maxSizeMb={mediaKind === 'video' ? 100 : mediaKind === 'audio' ? 30 : 5}

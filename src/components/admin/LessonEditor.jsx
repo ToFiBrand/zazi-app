@@ -134,15 +134,15 @@ export default function LessonEditor({ lesson, topics, existingQuestions, onSave
           <div className="grid md:grid-cols-3 gap-3">
             <div>
               <p className="text-zazi-navy/60 text-xs font-bold mb-1.5">Cover image</p>
-              <FileUpload bucket="lesson-media" kind="image" maxSizeMb={5} value={draft.coverImageUrl} onUploaded={url => setDraft(d => ({ ...d, coverImageUrl: url }))} onClear={() => setDraft(d => ({ ...d, coverImageUrl: '' }))} />
+              <FileUpload bucket="zazi-lesson-media" kind="image" maxSizeMb={5} value={draft.coverImageUrl} onUploaded={url => setDraft(d => ({ ...d, coverImageUrl: url }))} onClear={() => setDraft(d => ({ ...d, coverImageUrl: '' }))} />
             </div>
             <div>
               <p className="text-zazi-navy/60 text-xs font-bold mb-1.5">Lesson video</p>
-              <FileUpload bucket="lesson-media" kind="video" maxSizeMb={200} value={draft.videoUrl} onUploaded={url => setDraft(d => ({ ...d, videoUrl: url }))} onClear={() => setDraft(d => ({ ...d, videoUrl: '' }))} />
+              <FileUpload bucket="zazi-lesson-media" kind="video" maxSizeMb={200} value={draft.videoUrl} onUploaded={url => setDraft(d => ({ ...d, videoUrl: url }))} onClear={() => setDraft(d => ({ ...d, videoUrl: '' }))} />
             </div>
             <div>
               <p className="text-zazi-navy/60 text-xs font-bold mb-1.5">Resource file (PDF)</p>
-              <FileUpload bucket="lesson-media" kind="document" maxSizeMb={20} value={draft.resourceFileUrl} onUploaded={url => setDraft(d => ({ ...d, resourceFileUrl: url }))} onClear={() => setDraft(d => ({ ...d, resourceFileUrl: '' }))} />
+              <FileUpload bucket="zazi-lesson-media" kind="document" maxSizeMb={20} value={draft.resourceFileUrl} onUploaded={url => setDraft(d => ({ ...d, resourceFileUrl: url }))} onClear={() => setDraft(d => ({ ...d, resourceFileUrl: '' }))} />
             </div>
           </div>
 
